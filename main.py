@@ -273,7 +273,7 @@ async def on_message(message):
 
 @bot.event
 async def on_member_join(member):
-    """Auto-assign Unverified role and send welcome message"""
+    """Auto-assign Unverified role when member joins"""
     guild = member.guild
     
     # Give Unverified role
@@ -283,22 +283,6 @@ async def on_member_join(member):
             await member.add_roles(unverified_role)
         except:
             pass
-    
-    # Send welcome message in verify channel
-    verify_channel = discord.utils.get(guild.text_channels, name='✅-verify')
-    if verify_channel:
-        embed = discord.Embed(
-            title="🔐 Welcome to My Legs Are Not Mine!",
-            description=f"Hey {member.mention}!\n\n"
-                       "To access the server, please click the button below to verify yourself!\n\n"
-                       "You'll receive the server rules in your DMs after verification.",
-            color=discord.Color.blue()
-        )
-        embed.set_thumbnail(url=member.display_avatar.url)
-        embed.set_footer(text=f"Member #{guild.member_count}")
-        
-        view = VerifyButton()
-        await verify_channel.send(embed=embed, view=view, delete_after=300)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # VERIFICATION SYSTEM
@@ -1274,6 +1258,31 @@ async def closeticket(interaction: discord.Interaction):
         await interaction.channel.delete()
     except:
         pass
+
+@bot.tree.command(name="verify", description="🔐 Send verification panel to current channel")
+@app_commands.checks.has_permissions(administrator=True)
+async def verify_command(interaction: discord.Interaction):
+    """Send verification panel to current channel"""
+    
+    embed = discord.Embed(
+        title="🔐 Server Verification Required",
+        description="**Welcome to My Legs Are Not Mine!**\n\n"
+                   "To access the server and all channels, please verify yourself by clicking the button below.\n\n"
+                   "After verification, you'll receive the server rules in your DMs!\n\n"
+                   "━━━━━━━━━━━━━━━━━━━━━━\n"
+                   "**Why verification?**\n"
+                   "• Prevents spam and bots\n"
+                   "• Keeps the server safe\n"
+                   "• Takes only 1 click!",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text="Click the button below to get started!")
+    
+    await interaction.channel.send(embed=embed, view=VerifyButton())
+    await interaction.response.send_message(
+        "✅ Verification panel sent to this channel!",
+        ephemeral=True
+    )
 
 @bot.tree.command(name="nuke", description="💣 Delete everything (DANGEROUS)")
 @app_commands.checks.has_permissions(administrator=True)
