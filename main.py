@@ -405,7 +405,7 @@ class VerifyButton(discord.ui.View):
             )
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# APPLICATION SYSTEM
+# APPLICATION SYSTEM (UPGRADED)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
@@ -418,7 +418,7 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
     
     age = discord.ui.TextInput(
         label="Your Age",
-        placeholder="Enter your age...",
+        placeholder="Must be 13 or older...",
         required=True,
         max_length=3
     )
@@ -430,20 +430,18 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
         max_length=50
     )
     
-    experience = discord.ui.TextInput(
-        label="Experience",
-        placeholder="Tell us about your experience...",
+    timezone = discord.ui.TextInput(
+        label="Your Timezone (e.g. EST, PST, GMT)",
+        placeholder="What timezone are you in?",
         required=True,
-        style=discord.TextStyle.paragraph,
-        max_length=500
+        max_length=50
     )
     
-    why = discord.ui.TextInput(
-        label="Why Should We Choose You?",
-        placeholder="Tell us why you'd be a great fit...",
+    availability = discord.ui.TextInput(
+        label="Availability (hours per week)",
+        placeholder="How many hours per week can you dedicate?",
         required=True,
-        style=discord.TextStyle.paragraph,
-        max_length=500
+        max_length=100
     )
     
     async def on_submit(self, interaction: discord.Interaction):
@@ -452,6 +450,22 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
         
         guild = interaction.guild
         member = interaction.user
+        
+        # Age validation
+        try:
+            age_num = int(self.age.value)
+            if age_num < 13:
+                await interaction.followup.send(
+                    "❌ You must be at least 13 years old to apply for staff positions.",
+                    ephemeral=True
+                )
+                return
+        except:
+            await interaction.followup.send(
+                "❌ Please enter a valid age (numbers only).",
+                ephemeral=True
+            )
+            return
         
         # Find or create applications category
         app_category = discord.utils.get(guild.categories, name="📝 APPLICATIONS")
@@ -479,13 +493,14 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
         existing_app = discord.utils.get(guild.text_channels, topic=f"Application-{member.id}")
         if existing_app:
             await interaction.followup.send(
-                f"❌ You already have an open application: {existing_app.mention}",
+                f"❌ You already have an open application: {existing_app.mention}\n\n"
+                f"Please wait for staff to review your current application before submitting a new one.",
                 ephemeral=True
             )
             return
         
         # Create application channel
-        channel_name = f"📝app-{member.name}"
+        channel_name = f"📝app-{member.name}".lower()
         
         mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
         admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
@@ -497,16 +512,17 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
                 view_channel=True,
                 send_messages=True,
                 attach_files=True,
-                embed_links=True
+                embed_links=True,
+                read_message_history=True
             )
         }
         
         if mod_role:
-            overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+            overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True)
         if admin_role:
-            overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+            overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True)
         if owner_role:
-            overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+            overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True)
         
         app_channel = await guild.create_text_channel(
             name=channel_name,
@@ -515,66 +531,141 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
             overwrites=overwrites
         )
         
+        # Calculate account age
+        account_age = (discord.utils.utcnow() - member.created_at).days
+        server_age = (discord.utils.utcnow() - member.joined_at).days if member.joined_at else 0
+        
         # Create application embed
         embed = discord.Embed(
-            title="📝 Staff Application",
-            description=f"**Applicant:** {member.mention}\n"
-                       f"**User ID:** {member.id}\n"
-                       f"**Account Created:** {member.created_at.strftime('%Y-%m-%d')}\n"
-                       f"**Joined Server:** {member.joined_at.strftime('%Y-%m-%d')}\n\n"
+            title="📝 Staff Application Submitted",
+            description=f"**New application from {member.mention}**\n\n"
                        f"━━━━━━━━━━━━━━━━━━━━━━",
-            color=discord.Color.green()
+            color=discord.Color.blue()
         )
         
+        # User Info Section
         embed.add_field(
-            name="👤 Name/Username",
-            value=self.name.value,
+            name="👤 User Information",
+            value=f"**Username:** {member.name}\n"
+                  f"**Display Name:** {member.display_name}\n"
+                  f"**User ID:** `{member.id}`\n"
+                  f"**Account Age:** {account_age} days\n"
+                  f"**Server Member For:** {server_age} days",
             inline=False
         )
         
+        # Application Details
         embed.add_field(
-            name="🎂 Age",
-            value=self.age.value,
-            inline=True
-        )
-        
-        embed.add_field(
-            name="💼 Position",
-            value=self.position.value,
-            inline=True
-        )
-        
-        embed.add_field(
-            name="📚 Experience",
-            value=self.experience.value,
-            inline=False
-        )
-        
-        embed.add_field(
-            name="⭐ Why Should We Choose You?",
-            value=self.why.value,
+            name="📋 Application Details",
+            value=f"**Name:** {self.name.value}\n"
+                  f"**Age:** {self.age.value}\n"
+                  f"**Position:** {self.position.value}\n"
+                  f"**Timezone:** {self.timezone.value}\n"
+                  f"**Availability:** {self.availability.value}",
             inline=False
         )
         
         embed.set_thumbnail(url=member.display_avatar.url)
-        embed.set_footer(text=f"Application ID: {member.id}")
+        embed.set_footer(text=f"Application ID: {member.id} • Click buttons below to review")
         embed.timestamp = discord.utils.utcnow()
         
         # Mention staff
-        mention_text = f"{member.mention}\n\n"
+        mention_text = f"📢 New Staff Application!\n{member.mention}\n\n"
         if mod_role:
             mention_text += f"{mod_role.mention} "
         if admin_role:
             mention_text += f"{admin_role.mention}"
         
+        # Send application
         await app_channel.send(
             content=mention_text,
-            embed=embed,
+            embed=embed
+        )
+        
+        # Send follow-up questions
+        questions_embed = discord.Embed(
+            title="📝 Additional Questions",
+            description=f"{member.mention}, please answer these questions:",
+            color=discord.Color.green()
+        )
+        
+        questions_embed.add_field(
+            name="1️⃣ Experience",
+            value="Tell us about your previous moderation/staff experience (if any):",
+            inline=False
+        )
+        
+        questions_embed.add_field(
+            name="2️⃣ Why You?",
+            value="Why should we choose you for this position?",
+            inline=False
+        )
+        
+        questions_embed.add_field(
+            name="3️⃣ Scenario",
+            value="How would you handle a toxic member spamming in chat?",
+            inline=False
+        )
+        
+        questions_embed.add_field(
+            name="4️⃣ Activity",
+            value="What times are you usually most active?",
+            inline=False
+        )
+        
+        questions_embed.set_footer(text="Please answer each question below • Staff will review after you respond")
+        
+        await app_channel.send(embed=questions_embed)
+        
+        # Send review buttons
+        review_embed = discord.Embed(
+            title="⚙️ Review Actions",
+            description="**Staff:** Use the buttons below to review this application",
+            color=discord.Color.gold()
+        )
+        
+        await app_channel.send(
+            embed=review_embed,
             view=ApplicationReviewButtons()
         )
         
+        # Send DM to applicant
+        try:
+            dm_embed = discord.Embed(
+                title="✅ Application Submitted Successfully!",
+                description=f"Thank you for applying to the **{guild.name}** staff team!\n\n"
+                           f"**Your Application:**\n"
+                           f"• Position: {self.position.value}\n"
+                           f"• Status: 🟡 Pending Review\n\n"
+                           f"Your application has been submitted and staff will review it soon.\n\n"
+                           f"📝 **Next Steps:**\n"
+                           f"1. Answer the follow-up questions in {app_channel.mention}\n"
+                           f"2. Be patient and wait for staff review\n"
+                           f"3. You'll be notified of the decision\n\n"
+                           f"**Tips:**\n"
+                           f"• Be honest and detailed\n"
+                           f"• Check the application channel regularly\n"
+                           f"• Stay active in the server\n\n"
+                           f"Good luck! 🍀",
+                color=discord.Color.green()
+            )
+            dm_embed.set_footer(text=f"{guild.name} • Staff Applications")
+            dm_embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
+            
+            await member.send(embed=dm_embed)
+        except:
+            pass
+        
+        # Confirmation message
         await interaction.followup.send(
-            f"✅ Application submitted successfully!\n\nYour application has been created: {app_channel.mention}\n\nStaff will review it soon!",
+            f"✅ **Application Submitted Successfully!**\n\n"
+            f"Your application has been created: {app_channel.mention}\n\n"
+            f"**What's Next?**\n"
+            f"1. Answer the follow-up questions in the channel\n"
+            f"2. Staff will review your application\n"
+            f"3. You'll be notified of the decision\n\n"
+            f"Check your DMs for more information!\n\n"
+            f"Good luck! 🍀",
             ephemeral=True
         )
 
@@ -584,6 +675,16 @@ class ApplicationButton(discord.ui.View):
     
     @discord.ui.button(label="📝 Apply Now", style=discord.ButtonStyle.green, custom_id="application_button_persistent")
     async def application_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Check if user has Verified role
+        verified_role = discord.utils.get(interaction.guild.roles, name="✅ Verified")
+        if verified_role and verified_role not in interaction.user.roles:
+            await interaction.response.send_message(
+                "❌ You must be verified to apply for staff positions!\n\n"
+                "Please verify yourself first in the verification channel.",
+                ephemeral=True
+            )
+            return
+        
         # Open the application form modal
         await interaction.response.send_modal(ApplicationModal())
 
@@ -600,11 +701,59 @@ class ApplicationReviewButtons(discord.ui.View):
             )
             return
         
-        await interaction.response.send_message(
-            f"✅ **Application Accepted by {interaction.user.mention}**\n\n"
-            f"Please assign the appropriate role to the applicant and welcome them to the team!",
-            ephemeral=False
+        # Get applicant
+        channel_topic = interaction.channel.topic
+        if not channel_topic or "Application-" not in channel_topic:
+            await interaction.response.send_message(
+                "❌ Error: Could not find applicant information.",
+                ephemeral=True
+            )
+            return
+        
+        applicant_id = int(channel_topic.split("Application-")[1])
+        applicant = interaction.guild.get_member(applicant_id)
+        
+        if not applicant:
+            await interaction.response.send_message(
+                "❌ Error: Applicant not found in server.",
+                ephemeral=True
+            )
+            return
+        
+        # Send acceptance message
+        accept_embed = discord.Embed(
+            title="✅ Application Accepted!",
+            description=f"**Congratulations {applicant.mention}!**\n\n"
+                       f"Your application has been **ACCEPTED** by {interaction.user.mention}!\n\n"
+                       f"**Next Steps:**\n"
+                       f"• A staff member will assign your role shortly\n"
+                       f"• You'll get access to staff channels\n"
+                       f"• Welcome to the team! 🎉\n\n"
+                       f"Please wait for your role to be assigned.",
+            color=discord.Color.green()
         )
+        accept_embed.set_footer(text=f"Accepted by {interaction.user.name}")
+        accept_embed.timestamp = discord.utils.utcnow()
+        
+        await interaction.response.send_message(embed=accept_embed)
+        
+        # DM the applicant
+        try:
+            dm_embed = discord.Embed(
+                title="🎉 Congratulations! Application Accepted!",
+                description=f"Your staff application for **{interaction.guild.name}** has been **ACCEPTED**!\n\n"
+                           f"**You've been selected to join the staff team!**\n\n"
+                           f"Welcome aboard! A staff member will assign your role and provide you with more information soon.\n\n"
+                           f"We're excited to have you on the team! 🎉",
+                color=discord.Color.green()
+            )
+            dm_embed.set_footer(text=f"{interaction.guild.name} • Staff Team")
+            
+            await applicant.send(embed=dm_embed)
+        except:
+            await interaction.channel.send(
+                f"⚠️ Could not DM {applicant.mention} - Please contact them directly!"
+            )
         
         # Disable buttons
         for item in self.children:
@@ -620,16 +769,92 @@ class ApplicationReviewButtons(discord.ui.View):
             )
             return
         
-        await interaction.response.send_message(
-            f"❌ **Application Rejected by {interaction.user.mention}**\n\n"
-            f"Thank you for applying. Unfortunately, we cannot accept your application at this time.",
-            ephemeral=False
+        # Get applicant
+        channel_topic = interaction.channel.topic
+        if not channel_topic or "Application-" not in channel_topic:
+            await interaction.response.send_message(
+                "❌ Error: Could not find applicant information.",
+                ephemeral=True
+            )
+            return
+        
+        applicant_id = int(channel_topic.split("Application-")[1])
+        applicant = interaction.guild.get_member(applicant_id)
+        
+        if not applicant:
+            await interaction.response.send_message(
+                "❌ Error: Applicant not found in server.",
+                ephemeral=True
+            )
+            return
+        
+        # Send rejection message
+        reject_embed = discord.Embed(
+            title="❌ Application Rejected",
+            description=f"**{applicant.mention}**\n\n"
+                       f"Your application has been **REJECTED** by {interaction.user.mention}.\n\n"
+                       f"**This means:**\n"
+                       f"• We appreciate your interest in joining the staff team\n"
+                       f"• Unfortunately, we cannot accept your application at this time\n"
+                       f"• You may reapply after 30 days\n\n"
+                       f"Thank you for your interest, and we hope you continue to be an active member of our community!",
+            color=discord.Color.red()
         )
+        reject_embed.set_footer(text=f"Rejected by {interaction.user.name}")
+        reject_embed.timestamp = discord.utils.utcnow()
+        
+        await interaction.response.send_message(embed=reject_embed)
+        
+        # DM the applicant
+        try:
+            dm_embed = discord.Embed(
+                title="Application Update",
+                description=f"Thank you for applying to the **{interaction.guild.name}** staff team.\n\n"
+                           f"Unfortunately, we cannot accept your application at this time.\n\n"
+                           f"**What Now?**\n"
+                           f"• Continue being an active member\n"
+                           f"• Gain more experience\n"
+                           f"• You can reapply in 30 days\n\n"
+                           f"We appreciate your interest and hope to see you apply again in the future!\n\n"
+                           f"Don't be discouraged - keep being awesome! ✨",
+                color=discord.Color.red()
+            )
+            dm_embed.set_footer(text=f"{interaction.guild.name} • Staff Applications")
+            
+            await applicant.send(embed=dm_embed)
+        except:
+            await interaction.channel.send(
+                f"⚠️ Could not DM {applicant.mention} - Please contact them directly!"
+            )
         
         # Disable buttons
         for item in self.children:
             item.disabled = True
         await interaction.message.edit(view=self)
+    
+    @discord.ui.button(label="⏸️ Pending", style=discord.ButtonStyle.gray, custom_id="app_pending_persistent")
+    async def pending_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message(
+                "❌ Only staff can review applications!",
+                ephemeral=True
+            )
+            return
+        
+        pending_embed = discord.Embed(
+            title="⏸️ Application Set to Pending",
+            description=f"This application is now marked as **PENDING** by {interaction.user.mention}.\n\n"
+                       f"**This means:**\n"
+                       f"• More discussion needed\n"
+                       f"• Waiting for additional information\n"
+                       f"• Under consideration\n\n"
+                       f"The applicant will be notified when a decision is made.",
+            color=discord.Color.gold()
+        )
+        pending_embed.set_footer(text=f"Set by {interaction.user.name}")
+        pending_embed.timestamp = discord.utils.utcnow()
+        
+        await interaction.response.send_message(embed=pending_embed)
     
     @discord.ui.button(label="🔒 Close", style=discord.ButtonStyle.gray, custom_id="app_close_persistent")
     async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -644,9 +869,11 @@ class ApplicationReviewButtons(discord.ui.View):
         
         embed = discord.Embed(
             title="🔒 Application Closing",
-            description=f"Closed by {interaction.user.mention}\nDeleting channel in 5 seconds...",
+            description=f"This application has been closed by {interaction.user.mention}\n\n"
+                       f"Deleting channel in 5 seconds...",
             color=discord.Color.red()
         )
+        embed.set_footer(text="Application closed")
         
         await interaction.channel.send(embed=embed)
         await asyncio.sleep(5)
