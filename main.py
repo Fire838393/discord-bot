@@ -405,6 +405,258 @@ class VerifyButton(discord.ui.View):
             )
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# APPLICATION SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
+    name = discord.ui.TextInput(
+        label="Your Name/Username",
+        placeholder="Enter your name or username...",
+        required=True,
+        max_length=50
+    )
+    
+    age = discord.ui.TextInput(
+        label="Your Age",
+        placeholder="Enter your age...",
+        required=True,
+        max_length=3
+    )
+    
+    position = discord.ui.TextInput(
+        label="Position Applying For",
+        placeholder="Moderator, Helper, Developer, Tester, etc...",
+        required=True,
+        max_length=50
+    )
+    
+    experience = discord.ui.TextInput(
+        label="Experience",
+        placeholder="Tell us about your experience...",
+        required=True,
+        style=discord.TextStyle.paragraph,
+        max_length=500
+    )
+    
+    why = discord.ui.TextInput(
+        label="Why Should We Choose You?",
+        placeholder="Tell us why you'd be a great fit...",
+        required=True,
+        style=discord.TextStyle.paragraph,
+        max_length=500
+    )
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        # Respond immediately
+        await interaction.response.defer(ephemeral=True)
+        
+        guild = interaction.guild
+        member = interaction.user
+        
+        # Find or create applications category
+        app_category = discord.utils.get(guild.categories, name="📝 APPLICATIONS")
+        if not app_category:
+            app_category = await guild.create_category("📝 APPLICATIONS")
+            
+            # Set permissions
+            mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
+            admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
+            owner_role = discord.utils.get(guild.roles, name="👑 Owner")
+            
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            }
+            if mod_role:
+                overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True)
+            if admin_role:
+                overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True)
+            if owner_role:
+                overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True)
+            
+            await app_category.edit(overwrites=overwrites)
+        
+        # Check if user already has an application
+        existing_app = discord.utils.get(guild.text_channels, topic=f"Application-{member.id}")
+        if existing_app:
+            await interaction.followup.send(
+                f"❌ You already have an open application: {existing_app.mention}",
+                ephemeral=True
+            )
+            return
+        
+        # Create application channel
+        channel_name = f"📝app-{member.name}"
+        
+        mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
+        admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
+        owner_role = discord.utils.get(guild.roles, name="👑 Owner")
+        
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            member: discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                attach_files=True,
+                embed_links=True
+            )
+        }
+        
+        if mod_role:
+            overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+        if admin_role:
+            overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+        if owner_role:
+            overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+        
+        app_channel = await guild.create_text_channel(
+            name=channel_name,
+            category=app_category,
+            topic=f"Application-{member.id}",
+            overwrites=overwrites
+        )
+        
+        # Create application embed
+        embed = discord.Embed(
+            title="📝 Staff Application",
+            description=f"**Applicant:** {member.mention}\n"
+                       f"**User ID:** {member.id}\n"
+                       f"**Account Created:** {member.created_at.strftime('%Y-%m-%d')}\n"
+                       f"**Joined Server:** {member.joined_at.strftime('%Y-%m-%d')}\n\n"
+                       f"━━━━━━━━━━━━━━━━━━━━━━",
+            color=discord.Color.green()
+        )
+        
+        embed.add_field(
+            name="👤 Name/Username",
+            value=self.name.value,
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🎂 Age",
+            value=self.age.value,
+            inline=True
+        )
+        
+        embed.add_field(
+            name="💼 Position",
+            value=self.position.value,
+            inline=True
+        )
+        
+        embed.add_field(
+            name="📚 Experience",
+            value=self.experience.value,
+            inline=False
+        )
+        
+        embed.add_field(
+            name="⭐ Why Should We Choose You?",
+            value=self.why.value,
+            inline=False
+        )
+        
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.set_footer(text=f"Application ID: {member.id}")
+        embed.timestamp = discord.utils.utcnow()
+        
+        # Mention staff
+        mention_text = f"{member.mention}\n\n"
+        if mod_role:
+            mention_text += f"{mod_role.mention} "
+        if admin_role:
+            mention_text += f"{admin_role.mention}"
+        
+        await app_channel.send(
+            content=mention_text,
+            embed=embed,
+            view=ApplicationReviewButtons()
+        )
+        
+        await interaction.followup.send(
+            f"✅ Application submitted successfully!\n\nYour application has been created: {app_channel.mention}\n\nStaff will review it soon!",
+            ephemeral=True
+        )
+
+class ApplicationButton(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+    
+    @discord.ui.button(label="📝 Apply Now", style=discord.ButtonStyle.green, custom_id="application_button_persistent")
+    async def application_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Open the application form modal
+        await interaction.response.send_modal(ApplicationModal())
+
+class ApplicationReviewButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+    
+    @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.green, custom_id="app_accept_persistent")
+    async def accept_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message(
+                "❌ Only staff can review applications!",
+                ephemeral=True
+            )
+            return
+        
+        await interaction.response.send_message(
+            f"✅ **Application Accepted by {interaction.user.mention}**\n\n"
+            f"Please assign the appropriate role to the applicant and welcome them to the team!",
+            ephemeral=False
+        )
+        
+        # Disable buttons
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+    
+    @discord.ui.button(label="❌ Reject", style=discord.ButtonStyle.red, custom_id="app_reject_persistent")
+    async def reject_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message(
+                "❌ Only staff can review applications!",
+                ephemeral=True
+            )
+            return
+        
+        await interaction.response.send_message(
+            f"❌ **Application Rejected by {interaction.user.mention}**\n\n"
+            f"Thank you for applying. Unfortunately, we cannot accept your application at this time.",
+            ephemeral=False
+        )
+        
+        # Disable buttons
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+    
+    @discord.ui.button(label="🔒 Close", style=discord.ButtonStyle.gray, custom_id="app_close_persistent")
+    async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message(
+                "❌ Only staff can close applications!",
+                ephemeral=True
+            )
+            return
+        
+        await interaction.response.defer()
+        
+        embed = discord.Embed(
+            title="🔒 Application Closing",
+            description=f"Closed by {interaction.user.mention}\nDeleting channel in 5 seconds...",
+            color=discord.Color.red()
+        )
+        
+        await interaction.channel.send(embed=embed)
+        await asyncio.sleep(5)
+        
+        try:
+            await interaction.channel.delete()
+        except:
+            pass
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # TICKET SYSTEM WITH DROPDOWN MENU
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1301,6 +1553,37 @@ async def verify_command(interaction: discord.Interaction):
     )
     await interaction.channel.send(embed=embed, view=VerifyButton())
 
+@bot.tree.command(name="application", description="📝 Send application panel to current channel")
+@app_commands.checks.has_permissions(administrator=True)
+async def application_command(interaction: discord.Interaction):
+    """Send application panel to current channel"""
+    
+    embed = discord.Embed(
+        title="📝 Staff Application System",
+        description="**Want to join our staff team?**\n\n"
+                   "Click the button below to start your application!\n\n"
+                   "We're looking for:\n"
+                   "• Moderators 🛡️\n"
+                   "• Helpers 🤝\n"
+                   "• Developers 💻\n"
+                   "• Testers 🧪\n\n"
+                   "━━━━━━━━━━━━━━━━━━━━━━\n"
+                   "**Requirements:**\n"
+                   "• Active in the server\n"
+                   "• Mature and responsible\n"
+                   "• Good communication skills\n"
+                   "• Follow all server rules\n\n"
+                   "Good luck! 🍀",
+        color=discord.Color.green()
+    )
+    embed.set_footer(text="Click the button below to apply!")
+    
+    await interaction.response.send_message(
+        "✅ Application panel sent to this channel!",
+        ephemeral=True
+    )
+    await interaction.channel.send(embed=embed, view=ApplicationButton())
+
 @bot.tree.command(name="nuke", description="💣 Delete everything (DANGEROUS)")
 @app_commands.checks.has_permissions(administrator=True)
 async def nuke(interaction: discord.Interaction):
@@ -1449,6 +1732,8 @@ async def on_error(interaction: discord.Interaction, error: app_commands.AppComm
 async def setup_hook():
     """Register persistent views so buttons work after bot restarts"""
     bot.add_view(VerifyButton())
+    bot.add_view(ApplicationButton())
+    bot.add_view(ApplicationReviewButtons())
     bot.add_view(TicketButton())
     bot.add_view(TicketCloseButton())
     print("✅ Registered persistent views (buttons will work after restart)")
