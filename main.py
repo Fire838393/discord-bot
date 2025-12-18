@@ -1278,11 +1278,12 @@ async def verify_command(interaction: discord.Interaction):
     )
     embed.set_footer(text="Click the button below to get started!")
     
-    await interaction.channel.send(embed=embed, view=VerifyButton())
+    # Respond first, then send message
     await interaction.response.send_message(
         "✅ Verification panel sent to this channel!",
         ephemeral=True
     )
+    await interaction.channel.send(embed=embed, view=VerifyButton())
 
 @bot.tree.command(name="nuke", description="💣 Delete everything (DANGEROUS)")
 @app_commands.checks.has_permissions(administrator=True)
