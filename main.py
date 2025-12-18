@@ -302,20 +302,31 @@ class VerifyButton(discord.ui.View):
         unverified_role = discord.utils.get(guild.roles, name="❌ Unverified")
         
         # Check if already verified
-        if verified_role:
-            if verified_role in member.roles:
-                await interaction.response.send_message(
-                    "✅ You're already verified!",
-                    ephemeral=True
-                )
-                return
-            
-            # Add verified role
-            await member.add_roles(verified_role)
+        if verified_role and verified_role in member.roles:
+            await interaction.response.send_message(
+                "✅ You're already verified!",
+                ephemeral=True
+            )
+            return
         
-        # Remove unverified role
-        if unverified_role and unverified_role in member.roles:
-            await member.remove_roles(unverified_role)
+        # Respond FIRST (very important!)
+        await interaction.response.defer(ephemeral=True)
+        
+        # Then do role changes
+        try:
+            # Add verified role
+            if verified_role:
+                await member.add_roles(verified_role)
+            
+            # Remove unverified role
+            if unverified_role and unverified_role in member.roles:
+                await member.remove_roles(unverified_role)
+        except Exception as e:
+            await interaction.followup.send(
+                f"❌ Error: Could not assign roles. Make sure bot has proper permissions!\n{e}",
+                ephemeral=True
+            )
+            return
         
         # Send rules in DM
         try:
@@ -377,14 +388,19 @@ class VerifyButton(discord.ui.View):
             
             await member.send(embed=rules_embed)
             
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "✅ You've been verified! Check your DMs for the server rules!",
                 ephemeral=True
             )
             
         except discord.Forbidden:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "✅ You've been verified! (Please enable DMs to receive the rules)",
+                ephemeral=True
+            )
+        except Exception as e:
+            await interaction.followup.send(
+                f"✅ You've been verified!\n⚠️ Could not send rules: {e}",
                 ephemeral=True
             )
 
