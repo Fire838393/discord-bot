@@ -656,6 +656,51 @@ class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
         except:
             pass
         
+        # Send DM to SERVER OWNER
+        try:
+            owner = guild.owner
+            if owner:
+                owner_embed = discord.Embed(
+                    title="🔔 New Staff Application Received!",
+                    description=f"**Server:** {guild.name}\n"
+                               f"**Applicant:** {member.mention} ({member.name})\n\n"
+                               f"━━━━━━━━━━━━━━━━━━━━━━",
+                    color=discord.Color.blue()
+                )
+                
+                owner_embed.add_field(
+                    name="📋 Quick Info",
+                    value=f"**Name:** {self.name.value}\n"
+                          f"**Age:** {self.age.value}\n"
+                          f"**Position:** {self.position.value}\n"
+                          f"**Timezone:** {self.timezone.value}\n"
+                          f"**Availability:** {self.availability.value}",
+                    inline=False
+                )
+                
+                owner_embed.add_field(
+                    name="👤 User Info",
+                    value=f"**Username:** {member.name}\n"
+                          f"**User ID:** `{member.id}`\n"
+                          f"**Account Age:** {account_age} days\n"
+                          f"**Member For:** {server_age} days",
+                    inline=False
+                )
+                
+                owner_embed.add_field(
+                    name="🔗 Application Channel",
+                    value=f"{app_channel.mention}",
+                    inline=False
+                )
+                
+                owner_embed.set_thumbnail(url=member.display_avatar.url)
+                owner_embed.set_footer(text=f"Application ID: {member.id}")
+                owner_embed.timestamp = discord.utils.utcnow()
+                
+                await owner.send(embed=owner_embed)
+        except Exception as e:
+            print(f"Could not DM owner: {e}")
+        
         # Confirmation message
         await interaction.followup.send(
             f"✅ **Application Submitted Successfully!**\n\n"
@@ -1780,36 +1825,102 @@ async def verify_command(interaction: discord.Interaction):
     )
     await interaction.channel.send(embed=embed, view=VerifyButton())
 
-@bot.tree.command(name="application", description="📝 Send application panel to current channel")
+@bot.tree.command(name="application", description="📝 Create application channel and send panel")
 @app_commands.checks.has_permissions(administrator=True)
 async def application_command(interaction: discord.Interaction):
-    """Send application panel to current channel"""
+    """Create application channel and send panel to it"""
     
+    guild = interaction.guild
+    
+    # Check if application channel already exists
+    existing_channel = discord.utils.get(guild.text_channels, name="📝-applications")
+    
+    if existing_channel:
+        await interaction.response.send_message(
+            f"❌ Application channel already exists: {existing_channel.mention}\n\n"
+            f"Delete the old channel first if you want to create a new one.",
+            ephemeral=True
+        )
+        return
+    
+    await interaction.response.defer(ephemeral=True)
+    
+    # Get or create INFORMATION category
+    info_category = discord.utils.get(guild.categories, name="📢 INFORMATION")
+    if not info_category:
+        info_category = await guild.create_category("📢 INFORMATION")
+    
+    # Get roles
+    verified_role = discord.utils.get(guild.roles, name="✅ Verified")
+    mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
+    admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
+    owner_role = discord.utils.get(guild.roles, name="👑 Owner")
+    muted_role = discord.utils.get(guild.roles, name="🔇 Muted")
+    
+    # Set permissions
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(view_channel=False),
+        verified_role: discord.PermissionOverwrite(view_channel=True, send_messages=False) if verified_role else None,
+        muted_role: discord.PermissionOverwrite(view_channel=False) if muted_role else None,
+    }
+    
+    if mod_role:
+        overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+    if admin_role:
+        overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+    if owner_role:
+        overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+    
+    # Remove None values
+    overwrites = {k: v for k, v in overwrites.items() if v is not None}
+    
+    # Create application channel
+    app_channel = await guild.create_text_channel(
+        name="📝-applications",
+        category=info_category,
+        topic="Apply for staff positions here • Click the button below to apply",
+        overwrites=overwrites
+    )
+    
+    # Send application panel
     embed = discord.Embed(
         title="📝 Staff Application System",
         description="**Want to join our staff team?**\n\n"
                    "Click the button below to start your application!\n\n"
-                   "We're looking for:\n"
+                   "━━━━━━━━━━━━━━━━━━━━━━\n"
+                   "**We're looking for:**\n"
                    "• Moderators 🛡️\n"
                    "• Helpers 🤝\n"
                    "• Developers 💻\n"
                    "• Testers 🧪\n\n"
-                   "━━━━━━━━━━━━━━━━━━━━━━\n"
                    "**Requirements:**\n"
+                   "• Must be verified (✅ Verified role)\n"
+                   "• At least 13 years old\n"
                    "• Active in the server\n"
                    "• Mature and responsible\n"
                    "• Good communication skills\n"
                    "• Follow all server rules\n\n"
+                   "━━━━━━━━━━━━━━━━━━━━━━\n"
+                   "**⚠️ Important:**\n"
+                   "• You can only have ONE active application\n"
+                   "• Be honest and detailed in your answers\n"
+                   "• Staff will review within 48 hours\n"
+                   "• Check your DMs for updates\n\n"
                    "Good luck! 🍀",
         color=discord.Color.green()
     )
-    embed.set_footer(text="Click the button below to apply!")
+    embed.set_footer(text=f"{guild.name} • Staff Applications")
+    if guild.icon:
+        embed.set_thumbnail(url=guild.icon.url)
     
-    await interaction.response.send_message(
-        "✅ Application panel sent to this channel!",
+    await app_channel.send(embed=embed, view=ApplicationButton())
+    
+    await interaction.followup.send(
+        f"✅ **Application channel created successfully!**\n\n"
+        f"Channel: {app_channel.mention}\n\n"
+        f"Users can now apply for staff positions by clicking the button in that channel!",
         ephemeral=True
     )
-    await interaction.channel.send(embed=embed, view=ApplicationButton())
 
 @bot.tree.command(name="nuke", description="💣 Delete everything (DANGEROUS)")
 @app_commands.checks.has_permissions(administrator=True)
