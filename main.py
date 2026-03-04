@@ -1,43 +1,8 @@
 """
 ═══════════════════════════════════════════════════════════════════════════════
-🤖 MY LEGS ARE NOT MINE - DISCORD BOT
-Complete Server Management Bot - Ready for 24/7 Hosting
-═══════════════════════════════════════════════════════════════════════════════
-
-FEATURES:
-✅ Complete Auto Server Setup (/autosetup)
-✅ 10 Roles Auto-Created (Owner, Admin, Mod, Dev, Verified, Unverified, Muted, Tester, Player, Bot)
-✅ 25+ Channels Auto-Created (8 Categories)
-✅ Verification System with Buttons
-✅ Ticket System with 7 Types (Dropdown Menu)
-✅ Anti-Spam Protection (Auto-Timeout)
-✅ Anti-Nuke Detection
-✅ Full Moderation Commands
-✅ Keep-Alive for Replit
-✅ Environment Variable Support
-
-COMMANDS:
-/autosetup - Complete server setup
-/sync - Sync commands
-/help - Show all commands
-/createrole - Create role
-/giverole - Give role to member
-/removerole - Remove role from member
-/kick - Kick member
-/ban - Ban member
-/timeout - Timeout member
-/purge - Delete messages
-/ticket - Setup ticket panel
-/closeticket - Close ticket
-/nuke - Delete everything (WARNING)
-/confirmnuke - Confirm nuke
-
-HOSTING:
-1. Replit (Easiest)
-2. Railway (Best)
-3. Render
-4. Your PC (requires PC on)
-
+🤖 SMPIL - DISCORD BOT
+Complete Server Management Bot
+Server IP: SMPIL.aternos.me:50992
 ═══════════════════════════════════════════════════════════════════════════════
 """
 
@@ -50,26 +15,26 @@ from collections import defaultdict
 import os
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# KEEP-ALIVE FOR REPLIT (OPTIONAL - AUTO-DETECTS)
+# KEEP-ALIVE (for Replit hosting)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 try:
     from flask import Flask
     from threading import Thread
-    
+
     app = Flask('')
-    
+
     @app.route('/')
     def home():
         return """
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Discord Bot - Online</title>
+            <title>SMPIL Bot - Online</title>
             <style>
                 body {
                     font-family: 'Segoe UI', Arial, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -79,56 +44,47 @@ try:
                 }
                 .container {
                     text-align: center;
-                    background: rgba(255,255,255,0.1);
+                    background: rgba(255,255,255,0.05);
                     padding: 50px;
                     border-radius: 20px;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
                 }
-                h1 { font-size: 3em; margin: 0; }
-                .status { 
-                    color: #00ff88; 
-                    font-size: 1.5em; 
-                    margin: 20px 0;
-                }
-                .info { 
-                    background: rgba(0,0,0,0.2);
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin-top: 20px;
-                }
+                h1 { font-size: 3em; margin: 0; color: #e94560; }
+                .status { color: #00ff88; font-size: 1.5em; margin: 20px 0; }
+                .info { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin-top: 20px; }
+                .ip { color: #e94560; font-size: 1.2em; font-weight: bold; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🤖 Discord Bot</h1>
-                <div class="status">✅ ONLINE & RUNNING</div>
+                <h1>⚔️ SMPIL</h1>
+                <div class="status">✅ BOT ONLINE</div>
                 <div class="info">
-                    <p><strong>My Legs Are Not Mine</strong></p>
-                    <p>Server Management Bot</p>
-                    <p>Keep this URL for UptimeRobot</p>
+                    <p><strong>SMPIL Minecraft Server</strong></p>
+                    <p class="ip">SMPIL.aternos.me:50992</p>
+                    <p>Keep this URL in UptimeRobot to stay online 24/7</p>
                 </div>
             </div>
         </body>
         </html>
         """
-    
+
     def run():
         app.run(host='0.0.0.0', port=8080)
-    
+
     def keep_alive():
         t = Thread(target=run)
+        t.daemon = True
         t.start()
         print("✅ Keep-alive web server started on port 8080")
-        
+
     KEEP_ALIVE_ENABLED = True
-    
+
 except ImportError:
     print("⚠️  Flask not installed - Keep-alive disabled")
-    print("💡 Install with: pip install flask")
-    
     def keep_alive():
         pass
-    
     KEEP_ALIVE_ENABLED = False
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -138,14 +94,8 @@ except ImportError:
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Anti-spam tracking
 user_message_times = defaultdict(list)
 user_warnings = defaultdict(int)
-
-# Anti-nuke tracking
-recent_deletions = defaultdict(list)
-recent_bans = defaultdict(list)
-recent_kicks = defaultdict(list)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # EVENTS
@@ -154,133 +104,99 @@ recent_kicks = defaultdict(list)
 @bot.event
 async def on_ready():
     print("\n" + "═" * 70)
-    print("🤖 BOT IS NOW ONLINE".center(70))
+    print("⚔️  SMPIL BOT IS NOW ONLINE".center(70))
     print("═" * 70)
     print(f"📛 Bot Name: {bot.user.name}")
     print(f"🆔 Bot ID: {bot.user.id}")
-    print(f"📊 Total Servers: {len(bot.guilds)}")
-    print(f"👥 Total Users: {sum(guild.member_count for guild in bot.guilds)}")
+    print(f"📊 Servers: {len(bot.guilds)}")
     print("═" * 70)
-    
-    # Sync commands
     try:
         synced = await bot.tree.sync()
-        print(f"✅ Successfully synced {len(synced)} slash commands")
-        
-        if synced:
-            print("\n📋 Available Commands:")
-            for cmd in synced:
-                print(f"   • /{cmd.name}")
+        print(f"✅ Synced {len(synced)} slash commands")
     except Exception as e:
-        print(f"❌ Error syncing commands: {e}")
-    
-    print("═" * 70)
-    
-    # Set bot status
+        print(f"❌ Error syncing: {e}")
     await bot.change_presence(
-        activity=discord.Game(name="My Legs Are Not Mine | /help"),
+        activity=discord.Game(name="SMPIL.aternos.me:50992 | /help"),
         status=discord.Status.online
     )
-    
-    print("\n✅ Bot is ready and online 24/7!")
-    
-    if KEEP_ALIVE_ENABLED:
-        print("✅ Keep-alive server is running")
-    else:
-        print("⚠️  Keep-alive server is disabled")
-    
-    print("\n💡 Use /autosetup to setup your server")
-    print("💡 Use /help to see all commands")
-    print("═" * 70 + "\n")
+    print("✅ Bot ready!\n" + "═" * 70)
 
 @bot.event
-async def on_guild_join(guild):
-    """Sync commands when bot joins a new server"""
-    try:
-        await bot.tree.sync(guild=guild)
-        print(f"✅ Synced commands to new server: {guild.name}")
-    except Exception as e:
-        print(f"❌ Failed to sync commands to {guild.name}: {e}")
+async def setup_hook():
+    bot.add_view(VerifyButton())
+    bot.add_view(ApplicationButton())
+    bot.add_view(ApplicationReviewButtons())
+    bot.add_view(TicketButton())
+    bot.add_view(TicketCloseButton())
+    print("✅ Registered persistent views")
 
 @bot.event
 async def on_message(message):
-    """Anti-spam protection"""
-    
-    # Ignore bots
     if message.author.bot:
         return
-    
-    # Ignore DMs
     if not message.guild:
         return
-    
-    # Ignore admins
     if message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
-    
-    # Track spam
+
     user_id = message.author.id
     current_time = datetime.datetime.now()
-    
-    # Keep only messages from last 5 seconds
+
     user_message_times[user_id] = [
-        msg_time for msg_time in user_message_times[user_id]
-        if (current_time - msg_time).total_seconds() < 5
+        t for t in user_message_times[user_id]
+        if (current_time - t).total_seconds() < 5
     ]
     user_message_times[user_id].append(current_time)
-    
-    # Check for spam (5 messages in 5 seconds)
+
     if len(user_message_times[user_id]) >= 5:
         user_warnings[user_id] += 1
-        
-        # First warning: 5 minute timeout
         if user_warnings[user_id] == 1:
             try:
-                await message.author.timeout(datetime.timedelta(minutes=5), reason="Spam detected")
-                await message.channel.send(
-                    f"⚠️ {message.author.mention} has been timed out for 5 minutes for spamming!",
-                    delete_after=10
-                )
+                await message.author.timeout(datetime.timedelta(minutes=5), reason="Spam")
+                await message.channel.send(f"⚠️ {message.author.mention} timed out 5 minutes for spam!", delete_after=10)
             except:
                 pass
-        
-        # Second warning: 1 hour timeout
         elif user_warnings[user_id] == 2:
             try:
-                await message.author.timeout(datetime.timedelta(hours=1), reason="Spam detected (2nd warning)")
-                await message.channel.send(
-                    f"⚠️ {message.author.mention} has been timed out for 1 hour for continued spamming!",
-                    delete_after=10
-                )
+                await message.author.timeout(datetime.timedelta(hours=1), reason="Spam x2")
+                await message.channel.send(f"⚠️ {message.author.mention} timed out 1 hour for spam!", delete_after=10)
             except:
                 pass
-        
-        # Third warning: kick
         elif user_warnings[user_id] >= 3:
             try:
-                await message.author.kick(reason="Spam detected (3rd warning)")
-                await message.channel.send(
-                    f"🔨 {message.author.mention} has been kicked for repeated spamming!",
-                    delete_after=10
-                )
+                await message.author.kick(reason="Spam x3")
+                await message.channel.send(f"🔨 {message.author.mention} kicked for repeated spam!", delete_after=10)
             except:
                 pass
-        
         user_message_times[user_id].clear()
-    
+
     await bot.process_commands(message)
 
 @bot.event
 async def on_member_join(member):
-    """Auto-assign Unverified role when member joins"""
     guild = member.guild
-    
-    # Give Unverified role
-    unverified_role = discord.utils.get(guild.roles, name="❌ Unverified")
-    if unverified_role:
+    # Give unverified role
+    unverified = discord.utils.get(guild.roles, name="❌ Unverified")
+    if unverified:
         try:
-            await member.add_roles(unverified_role)
+            await member.add_roles(unverified)
+        except:
+            pass
+    # Welcome message
+    general = discord.utils.get(guild.text_channels, name='💬-general')
+    if general:
+        embed = discord.Embed(
+            title="⚔️ Welcome to SMPIL!",
+            description=f"Hey {member.mention}! Welcome to the server!\n\n"
+                       f"**Server IP:** `SMPIL.aternos.me:50992`\n\n"
+                       f"Go to <#verify> to get access to all channels!",
+            color=discord.Color.from_rgb(233, 69, 96)
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.set_footer(text=f"Member #{guild.member_count}")
+        try:
+            await general.send(embed=embed)
         except:
             pass
 
@@ -291,891 +207,140 @@ async def on_member_join(member):
 class VerifyButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-    
-    @discord.ui.button(label="✅ Verify Me", style=discord.ButtonStyle.green, custom_id="verify_button_persistent")
+
+    @discord.ui.button(label="✅ Verify Me", style=discord.ButtonStyle.green, custom_id="smpil_verify_persistent")
     async def verify_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         guild = interaction.guild
         member = interaction.user
-        
-        # Get roles
         verified_role = discord.utils.get(guild.roles, name="✅ Verified")
         unverified_role = discord.utils.get(guild.roles, name="❌ Unverified")
-        
-        # Check if already verified
+
         if verified_role and verified_role in member.roles:
-            await interaction.response.send_message(
-                "✅ You're already verified!",
-                ephemeral=True
-            )
+            await interaction.response.send_message("✅ You're already verified!", ephemeral=True)
             return
-        
-        # Respond FIRST (very important!)
+
         await interaction.response.defer(ephemeral=True)
-        
-        # Then do role changes
+
         try:
-            # Add verified role
             if verified_role:
                 await member.add_roles(verified_role)
-            
-            # Remove unverified role
             if unverified_role and unverified_role in member.roles:
                 await member.remove_roles(unverified_role)
         except Exception as e:
-            await interaction.followup.send(
-                f"❌ Error: Could not assign roles. Make sure bot has proper permissions!\n{e}",
-                ephemeral=True
-            )
+            await interaction.followup.send(f"❌ Could not assign roles: {e}", ephemeral=True)
             return
-        
-        # Send rules in DM
+
         try:
             rules_embed = discord.Embed(
-                title="📜 SERVER RULES - My Legs Are Not Mine",
-                description="Welcome to the server! Please read and follow these rules:",
-                color=discord.Color.gold()
+                title="📜 SMPIL SERVER RULES",
+                description="Welcome to SMPIL! Please read all the rules:",
+                color=discord.Color.from_rgb(233, 69, 96)
             )
-            
-            rules_embed.add_field(
-                name="1️⃣ Be Respectful",
-                value="Treat everyone with respect. No harassment, hate speech, or bullying.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="2️⃣ No Spam",
-                value="Don't spam messages, emojis, or mentions. Spam = automatic timeout.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="3️⃣ No NSFW Content",
-                value="Keep all content appropriate for all ages.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="4️⃣ No Advertising",
-                value="Don't advertise other servers, products, or services without permission.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="5️⃣ No Cheating/Exploits",
-                value="Don't discuss or share cheats, hacks, or exploits for the game.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="6️⃣ English Only",
-                value="Please use English in public channels so everyone can understand.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="7️⃣ Listen to Staff",
-                value="Follow instructions from Moderators and Admins. Their decisions are final.",
-                inline=False
-            )
-            
-            rules_embed.add_field(
-                name="⚠️ Consequences",
-                value="Breaking rules: Warning → Timeout → Kick → Ban",
-                inline=False
-            )
-            
-            rules_embed.set_footer(text="By verifying, you agree to follow these rules!")
-            
+            rules_embed.add_field(name="1️⃣ No XRay", value="No xray texture packs or hacks. You will be banned.", inline=False)
+            rules_embed.add_field(name="2️⃣ No Hacks", value="No reach hacks, fly hacks, or any cheat client.", inline=False)
+            rules_embed.add_field(name="3️⃣ No Duping", value="No item duplication or exploit abuse. Bannable offense.", inline=False)
+            rules_embed.add_field(name="4️⃣ No Anchors/End Crystals in PVP", value="These are banned in PVP combat.", inline=False)
+            rules_embed.add_field(name="5️⃣ No Thorns", value="Thorns enchantment is banned on armor.", inline=False)
+            rules_embed.add_field(name="6️⃣ No Griefing/Stealing", value="Don't steal from or grief other players (unless there's an active war).", inline=False)
+            rules_embed.add_field(name="7️⃣ No Minimaps", value="Minimaps are banned.", inline=False)
+            rules_embed.add_field(name="8️⃣ Don't Know the Seed", value="Knowing/using the seed to find structures is bannable.", inline=False)
+            rules_embed.add_field(name="9️⃣ No Combat Logging", value="Don't log out during PVP. You'll die and drop items.", inline=False)
+            rules_embed.add_field(name="🔟 Respect Others", value="No harassment, hate speech, or bullying.", inline=False)
+            rules_embed.add_field(name="⚠️ Punishment System", value="Warning → Kick → Temp Ban → Permanent Ban", inline=False)
+            rules_embed.set_footer(text="SMPIL.aternos.me:50992 • By verifying you agree to follow these rules!")
             await member.send(embed=rules_embed)
-            
-            await interaction.followup.send(
-                "✅ You've been verified! Check your DMs for the server rules!",
-                ephemeral=True
-            )
-            
+            await interaction.followup.send("✅ Verified! Check your DMs for the server rules!", ephemeral=True)
         except discord.Forbidden:
-            await interaction.followup.send(
-                "✅ You've been verified! (Please enable DMs to receive the rules)",
-                ephemeral=True
-            )
-        except Exception as e:
-            await interaction.followup.send(
-                f"✅ You've been verified!\n⚠️ Could not send rules: {e}",
-                ephemeral=True
-            )
+            await interaction.followup.send("✅ Verified! (Enable DMs to receive the server rules)", ephemeral=True)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# APPLICATION SYSTEM (UPGRADED)
+# TICKET SYSTEM
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class ApplicationModal(discord.ui.Modal, title="📝 Staff Application"):
-    name = discord.ui.TextInput(
-        label="Your Name/Username",
-        placeholder="Enter your name or username...",
-        required=True,
-        max_length=50
-    )
-    
-    age = discord.ui.TextInput(
-        label="Your Age",
-        placeholder="Must be 13 or older...",
-        required=True,
-        max_length=3
-    )
-    
-    position = discord.ui.TextInput(
-        label="Position Applying For",
-        placeholder="Moderator, Helper, Developer, Tester, etc...",
-        required=True,
-        max_length=50
-    )
-    
-    timezone = discord.ui.TextInput(
-        label="Your Timezone (e.g. EST, PST, GMT)",
-        placeholder="What timezone are you in?",
-        required=True,
-        max_length=50
-    )
-    
-    availability = discord.ui.TextInput(
-        label="Availability (hours per week)",
-        placeholder="How many hours per week can you dedicate?",
-        required=True,
-        max_length=100
-    )
-    
-    async def on_submit(self, interaction: discord.Interaction):
-        # Respond immediately
-        await interaction.response.defer(ephemeral=True)
-        
+class TicketTypeSelect(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label="🐛 Report Bug", description="Report a bug or issue", emoji="🐛", value="bug"),
+            discord.SelectOption(label="💡 Suggestion", description="Suggest a feature or idea", emoji="💡", value="suggestion"),
+            discord.SelectOption(label="❓ General Help", description="Get help with something", emoji="❓", value="help"),
+            discord.SelectOption(label="👤 Report Player", description="Report a player breaking rules", emoji="👤", value="report_player"),
+            discord.SelectOption(label="🔨 Ban Appeal", description="Appeal a ban or punishment", emoji="🔨", value="appeal"),
+            discord.SelectOption(label="⚔️ PVP Dispute", description="Dispute a PVP or combat issue", emoji="⚔️", value="pvp"),
+            discord.SelectOption(label="🎯 Other", description="Anything else", emoji="🎯", value="other"),
+        ]
+        super().__init__(
+            placeholder="🎫 Select ticket type...",
+            min_values=1, max_values=1,
+            options=options,
+            custom_id="smpil_ticket_select_persistent"
+        )
+
+    async def callback(self, interaction: discord.Interaction):
         guild = interaction.guild
         member = interaction.user
-        
-        # Age validation
-        try:
-            age_num = int(self.age.value)
-            if age_num < 13:
-                await interaction.followup.send(
-                    "❌ You must be at least 13 years old to apply for staff positions.",
-                    ephemeral=True
-                )
-                return
-        except:
-            await interaction.followup.send(
-                "❌ Please enter a valid age (numbers only).",
-                ephemeral=True
-            )
+        ticket_type = self.values[0]
+
+        existing = discord.utils.get(guild.text_channels, topic=f"Ticket-{member.id}")
+        if existing:
+            await interaction.response.send_message(f"❌ You already have a ticket open: {existing.mention}", ephemeral=True)
             return
-        
-        # Find or create applications category
-        app_category = discord.utils.get(guild.categories, name="📝 APPLICATIONS")
-        if not app_category:
-            app_category = await guild.create_category("📝 APPLICATIONS")
-            
-            # Set permissions
-            mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
-            admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
-            owner_role = discord.utils.get(guild.roles, name="👑 Owner")
-            
-            overwrites = {
-                guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            }
-            if mod_role:
-                overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True)
-            if admin_role:
-                overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True)
-            if owner_role:
-                overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True)
-            
-            await app_category.edit(overwrites=overwrites)
-        
-        # Check if user already has an application
-        existing_app = discord.utils.get(guild.text_channels, topic=f"Application-{member.id}")
-        if existing_app:
-            await interaction.followup.send(
-                f"❌ You already have an open application: {existing_app.mention}\n\n"
-                f"Please wait for staff to review your current application before submitting a new one.",
-                ephemeral=True
-            )
-            return
-        
-        # Create application channel
-        channel_name = f"📝app-{member.name}".lower()
-        
-        mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
+
+        await interaction.response.defer(ephemeral=True)
+
+        category = discord.utils.get(guild.categories, name="🎫 TICKETS")
+        if not category:
+            category = await guild.create_category("🎫 TICKETS")
+
+        mod_role = discord.utils.get(guild.roles, name="⚔️ Mod")
         admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
         owner_role = discord.utils.get(guild.roles, name="👑 Owner")
-        
+
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            member: discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                attach_files=True,
-                embed_links=True,
-                read_message_history=True
-            )
+            member: discord.PermissionOverwrite(view_channel=True, send_messages=True, attach_files=True, embed_links=True)
         }
-        
         if mod_role:
             overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True)
         if admin_role:
             overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True)
         if owner_role:
             overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, manage_messages=True)
-        
-        app_channel = await guild.create_text_channel(
-            name=channel_name,
-            category=app_category,
-            topic=f"Application-{member.id}",
-            overwrites=overwrites
-        )
-        
-        # Calculate account age
-        account_age = (discord.utils.utcnow() - member.created_at).days
-        server_age = (discord.utils.utcnow() - member.joined_at).days if member.joined_at else 0
-        
-        # Create application embed
-        embed = discord.Embed(
-            title="📝 Staff Application Submitted",
-            description=f"**New application from {member.mention}**\n\n"
-                       f"━━━━━━━━━━━━━━━━━━━━━━",
-            color=discord.Color.blue()
-        )
-        
-        # User Info Section
-        embed.add_field(
-            name="👤 User Information",
-            value=f"**Username:** {member.name}\n"
-                  f"**Display Name:** {member.display_name}\n"
-                  f"**User ID:** `{member.id}`\n"
-                  f"**Account Age:** {account_age} days\n"
-                  f"**Server Member For:** {server_age} days",
-            inline=False
-        )
-        
-        # Application Details
-        embed.add_field(
-            name="📋 Application Details",
-            value=f"**Name:** {self.name.value}\n"
-                  f"**Age:** {self.age.value}\n"
-                  f"**Position:** {self.position.value}\n"
-                  f"**Timezone:** {self.timezone.value}\n"
-                  f"**Availability:** {self.availability.value}",
-            inline=False
-        )
-        
-        embed.set_thumbnail(url=member.display_avatar.url)
-        embed.set_footer(text=f"Application ID: {member.id} • Click buttons below to review")
-        embed.timestamp = discord.utils.utcnow()
-        
-        # Mention staff
-        mention_text = f"📢 New Staff Application!\n{member.mention}\n\n"
-        if mod_role:
-            mention_text += f"{mod_role.mention} "
-        if admin_role:
-            mention_text += f"{admin_role.mention}"
-        
-        # Send application
-        await app_channel.send(
-            content=mention_text,
-            embed=embed
-        )
-        
-        # Send follow-up questions
-        questions_embed = discord.Embed(
-            title="📝 Additional Questions",
-            description=f"{member.mention}, please answer these questions:",
-            color=discord.Color.green()
-        )
-        
-        questions_embed.add_field(
-            name="1️⃣ Experience",
-            value="Tell us about your previous moderation/staff experience (if any):",
-            inline=False
-        )
-        
-        questions_embed.add_field(
-            name="2️⃣ Why You?",
-            value="Why should we choose you for this position?",
-            inline=False
-        )
-        
-        questions_embed.add_field(
-            name="3️⃣ Scenario",
-            value="How would you handle a toxic member spamming in chat?",
-            inline=False
-        )
-        
-        questions_embed.add_field(
-            name="4️⃣ Activity",
-            value="What times are you usually most active?",
-            inline=False
-        )
-        
-        questions_embed.set_footer(text="Please answer each question below • Staff will review after you respond")
-        
-        await app_channel.send(embed=questions_embed)
-        
-        # Send review buttons
-        review_embed = discord.Embed(
-            title="⚙️ Review Actions",
-            description="**Staff:** Use the buttons below to review this application",
-            color=discord.Color.gold()
-        )
-        
-        await app_channel.send(
-            embed=review_embed,
-            view=ApplicationReviewButtons()
-        )
-        
-        # Send DM to applicant
-        try:
-            dm_embed = discord.Embed(
-                title="✅ Application Submitted Successfully!",
-                description=f"Thank you for applying to the **{guild.name}** staff team!\n\n"
-                           f"**Your Application:**\n"
-                           f"• Position: {self.position.value}\n"
-                           f"• Status: 🟡 Pending Review\n\n"
-                           f"Your application has been submitted and staff will review it soon.\n\n"
-                           f"📝 **Next Steps:**\n"
-                           f"1. Answer the follow-up questions in {app_channel.mention}\n"
-                           f"2. Be patient and wait for staff review\n"
-                           f"3. You'll be notified of the decision\n\n"
-                           f"**Tips:**\n"
-                           f"• Be honest and detailed\n"
-                           f"• Check the application channel regularly\n"
-                           f"• Stay active in the server\n\n"
-                           f"Good luck! 🍀",
-                color=discord.Color.green()
-            )
-            dm_embed.set_footer(text=f"{guild.name} • Staff Applications")
-            dm_embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
-            
-            await member.send(embed=dm_embed)
-        except:
-            pass
-        
-        # Send DM to SERVER OWNER
-        try:
-            owner = guild.owner
-            if owner:
-                owner_embed = discord.Embed(
-                    title="🔔 New Staff Application Received!",
-                    description=f"**Server:** {guild.name}\n"
-                               f"**Applicant:** {member.mention} ({member.name})\n\n"
-                               f"━━━━━━━━━━━━━━━━━━━━━━",
-                    color=discord.Color.blue()
-                )
-                
-                owner_embed.add_field(
-                    name="📋 Quick Info",
-                    value=f"**Name:** {self.name.value}\n"
-                          f"**Age:** {self.age.value}\n"
-                          f"**Position:** {self.position.value}\n"
-                          f"**Timezone:** {self.timezone.value}\n"
-                          f"**Availability:** {self.availability.value}",
-                    inline=False
-                )
-                
-                owner_embed.add_field(
-                    name="👤 User Info",
-                    value=f"**Username:** {member.name}\n"
-                          f"**User ID:** `{member.id}`\n"
-                          f"**Account Age:** {account_age} days\n"
-                          f"**Member For:** {server_age} days",
-                    inline=False
-                )
-                
-                owner_embed.add_field(
-                    name="🔗 Application Channel",
-                    value=f"{app_channel.mention}",
-                    inline=False
-                )
-                
-                owner_embed.set_thumbnail(url=member.display_avatar.url)
-                owner_embed.set_footer(text=f"Application ID: {member.id}")
-                owner_embed.timestamp = discord.utils.utcnow()
-                
-                await owner.send(embed=owner_embed)
-        except Exception as e:
-            print(f"Could not DM owner: {e}")
-        
-        # Confirmation message
-        await interaction.followup.send(
-            f"✅ **Application Submitted Successfully!**\n\n"
-            f"Your application has been created: {app_channel.mention}\n\n"
-            f"**What's Next?**\n"
-            f"1. Answer the follow-up questions in the channel\n"
-            f"2. Staff will review your application\n"
-            f"3. You'll be notified of the decision\n\n"
-            f"Check your DMs for more information!\n\n"
-            f"Good luck! 🍀",
-            ephemeral=True
-        )
 
-class ApplicationButton(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-    
-    @discord.ui.button(label="📝 Apply Now", style=discord.ButtonStyle.green, custom_id="application_button_persistent")
-    async def application_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # Check if user has Verified role
-        verified_role = discord.utils.get(interaction.guild.roles, name="✅ Verified")
-        if verified_role and verified_role not in interaction.user.roles:
-            await interaction.response.send_message(
-                "❌ You must be verified to apply for staff positions!\n\n"
-                "Please verify yourself first in the verification channel.",
-                ephemeral=True
-            )
-            return
-        
-        # Open the application form modal
-        await interaction.response.send_modal(ApplicationModal())
-
-class ApplicationReviewButtons(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-    
-    @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.green, custom_id="app_accept_persistent")
-    async def accept_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if not interaction.user.guild_permissions.manage_guild:
-            await interaction.response.send_message(
-                "❌ Only staff can review applications!",
-                ephemeral=True
-            )
-            return
-        
-        # Get applicant
-        channel_topic = interaction.channel.topic
-        if not channel_topic or "Application-" not in channel_topic:
-            await interaction.response.send_message(
-                "❌ Error: Could not find applicant information.",
-                ephemeral=True
-            )
-            return
-        
-        applicant_id = int(channel_topic.split("Application-")[1])
-        applicant = interaction.guild.get_member(applicant_id)
-        
-        if not applicant:
-            await interaction.response.send_message(
-                "❌ Error: Applicant not found in server.",
-                ephemeral=True
-            )
-            return
-        
-        # Send acceptance message
-        accept_embed = discord.Embed(
-            title="✅ Application Accepted!",
-            description=f"**Congratulations {applicant.mention}!**\n\n"
-                       f"Your application has been **ACCEPTED** by {interaction.user.mention}!\n\n"
-                       f"**Next Steps:**\n"
-                       f"• A staff member will assign your role shortly\n"
-                       f"• You'll get access to staff channels\n"
-                       f"• Welcome to the team! 🎉\n\n"
-                       f"Please wait for your role to be assigned.",
-            color=discord.Color.green()
-        )
-        accept_embed.set_footer(text=f"Accepted by {interaction.user.name}")
-        accept_embed.timestamp = discord.utils.utcnow()
-        
-        await interaction.response.send_message(embed=accept_embed)
-        
-        # DM the applicant
-        try:
-            dm_embed = discord.Embed(
-                title="🎉 Congratulations! Application Accepted!",
-                description=f"Your staff application for **{interaction.guild.name}** has been **ACCEPTED**!\n\n"
-                           f"**You've been selected to join the staff team!**\n\n"
-                           f"Welcome aboard! A staff member will assign your role and provide you with more information soon.\n\n"
-                           f"We're excited to have you on the team! 🎉",
-                color=discord.Color.green()
-            )
-            dm_embed.set_footer(text=f"{interaction.guild.name} • Staff Team")
-            
-            await applicant.send(embed=dm_embed)
-        except:
-            await interaction.channel.send(
-                f"⚠️ Could not DM {applicant.mention} - Please contact them directly!"
-            )
-        
-        # Disable buttons
-        for item in self.children:
-            item.disabled = True
-        await interaction.message.edit(view=self)
-    
-    @discord.ui.button(label="❌ Reject", style=discord.ButtonStyle.red, custom_id="app_reject_persistent")
-    async def reject_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if not interaction.user.guild_permissions.manage_guild:
-            await interaction.response.send_message(
-                "❌ Only staff can review applications!",
-                ephemeral=True
-            )
-            return
-        
-        # Get applicant
-        channel_topic = interaction.channel.topic
-        if not channel_topic or "Application-" not in channel_topic:
-            await interaction.response.send_message(
-                "❌ Error: Could not find applicant information.",
-                ephemeral=True
-            )
-            return
-        
-        applicant_id = int(channel_topic.split("Application-")[1])
-        applicant = interaction.guild.get_member(applicant_id)
-        
-        if not applicant:
-            await interaction.response.send_message(
-                "❌ Error: Applicant not found in server.",
-                ephemeral=True
-            )
-            return
-        
-        # Send rejection message
-        reject_embed = discord.Embed(
-            title="❌ Application Rejected",
-            description=f"**{applicant.mention}**\n\n"
-                       f"Your application has been **REJECTED** by {interaction.user.mention}.\n\n"
-                       f"**This means:**\n"
-                       f"• We appreciate your interest in joining the staff team\n"
-                       f"• Unfortunately, we cannot accept your application at this time\n"
-                       f"• You may reapply after 30 days\n\n"
-                       f"Thank you for your interest, and we hope you continue to be an active member of our community!",
-            color=discord.Color.red()
-        )
-        reject_embed.set_footer(text=f"Rejected by {interaction.user.name}")
-        reject_embed.timestamp = discord.utils.utcnow()
-        
-        await interaction.response.send_message(embed=reject_embed)
-        
-        # DM the applicant
-        try:
-            dm_embed = discord.Embed(
-                title="Application Update",
-                description=f"Thank you for applying to the **{interaction.guild.name}** staff team.\n\n"
-                           f"Unfortunately, we cannot accept your application at this time.\n\n"
-                           f"**What Now?**\n"
-                           f"• Continue being an active member\n"
-                           f"• Gain more experience\n"
-                           f"• You can reapply in 30 days\n\n"
-                           f"We appreciate your interest and hope to see you apply again in the future!\n\n"
-                           f"Don't be discouraged - keep being awesome! ✨",
-                color=discord.Color.red()
-            )
-            dm_embed.set_footer(text=f"{interaction.guild.name} • Staff Applications")
-            
-            await applicant.send(embed=dm_embed)
-        except:
-            await interaction.channel.send(
-                f"⚠️ Could not DM {applicant.mention} - Please contact them directly!"
-            )
-        
-        # Disable buttons
-        for item in self.children:
-            item.disabled = True
-        await interaction.message.edit(view=self)
-    
-    @discord.ui.button(label="⏸️ Pending", style=discord.ButtonStyle.gray, custom_id="app_pending_persistent")
-    async def pending_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if not interaction.user.guild_permissions.manage_guild:
-            await interaction.response.send_message(
-                "❌ Only staff can review applications!",
-                ephemeral=True
-            )
-            return
-        
-        pending_embed = discord.Embed(
-            title="⏸️ Application Set to Pending",
-            description=f"This application is now marked as **PENDING** by {interaction.user.mention}.\n\n"
-                       f"**This means:**\n"
-                       f"• More discussion needed\n"
-                       f"• Waiting for additional information\n"
-                       f"• Under consideration\n\n"
-                       f"The applicant will be notified when a decision is made.",
-            color=discord.Color.gold()
-        )
-        pending_embed.set_footer(text=f"Set by {interaction.user.name}")
-        pending_embed.timestamp = discord.utils.utcnow()
-        
-        await interaction.response.send_message(embed=pending_embed)
-    
-    @discord.ui.button(label="🔒 Close", style=discord.ButtonStyle.gray, custom_id="app_close_persistent")
-    async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if not interaction.user.guild_permissions.manage_guild:
-            await interaction.response.send_message(
-                "❌ Only staff can close applications!",
-                ephemeral=True
-            )
-            return
-        
-        await interaction.response.defer()
-        
-        embed = discord.Embed(
-            title="🔒 Application Closing",
-            description=f"This application has been closed by {interaction.user.mention}\n\n"
-                       f"Deleting channel in 5 seconds...",
-            color=discord.Color.red()
-        )
-        embed.set_footer(text="Application closed")
-        
-        await interaction.channel.send(embed=embed)
-        await asyncio.sleep(5)
-        
-        try:
-            await interaction.channel.delete()
-        except:
-            pass
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TICKET SYSTEM WITH DROPDOWN MENU
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class TicketTypeSelect(discord.ui.Select):
-    def __init__(self):
-        options = [
-            discord.SelectOption(
-                label="🐛 Report Bug",
-                description="Report a bug or issue with the game",
-                emoji="🐛",
-                value="bug"
-            ),
-            discord.SelectOption(
-                label="💡 Suggestion",
-                description="Submit a suggestion or feature request",
-                emoji="💡",
-                value="suggestion"
-            ),
-            discord.SelectOption(
-                label="❓ General Help",
-                description="Get help with general questions",
-                emoji="❓",
-                value="help"
-            ),
-            discord.SelectOption(
-                label="👤 Report Player",
-                description="Report a player for breaking rules",
-                emoji="👤",
-                value="report_player"
-            ),
-            discord.SelectOption(
-                label="🔨 Ban Appeal",
-                description="Appeal a ban or punishment",
-                emoji="🔨",
-                value="appeal"
-            ),
-            discord.SelectOption(
-                label="💰 Purchase Support",
-                description="Issues with purchases or payments",
-                emoji="💰",
-                value="purchase"
-            ),
-            discord.SelectOption(
-                label="🎯 Other",
-                description="Other issues or questions",
-                emoji="🎯",
-                value="other"
-            )
-        ]
-        
-        super().__init__(
-            placeholder="🎫 Select ticket type...",
-            min_values=1,
-            max_values=1,
-            options=options,
-            custom_id="ticket_type_select_persistent"
-        )
-    
-    async def callback(self, interaction: discord.Interaction):
-        guild = interaction.guild
-        member = interaction.user
-        ticket_type = self.values[0]
-        
-        # Check if user already has a ticket
-        existing = discord.utils.get(guild.text_channels, topic=f"Ticket-{member.id}")
-        if existing:
-            await interaction.response.send_message(
-                f"❌ You already have an open ticket: {existing.mention}",
-                ephemeral=True
-            )
-            return
-        
-        await interaction.response.defer(ephemeral=True)
-        
-        # Get or create ticket category
-        category = discord.utils.get(guild.categories, name="🎫 TICKETS")
-        if not category:
-            category = await guild.create_category("🎫 TICKETS")
-        
-        # Get staff roles
-        mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
-        admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
-        owner_role = discord.utils.get(guild.roles, name="👑 Owner")
-        dev_role = discord.utils.get(guild.roles, name="💻 Developer")
-        
-        # Set permissions
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            member: discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                attach_files=True,
-                embed_links=True
-            )
+        ticket_info = {
+            "bug":           {"emoji": "🐛", "name": "bug",     "title": "Bug Report",     "color": discord.Color.red(),    "desc": "**Describe the bug:**\n\n**Steps to reproduce:**\n\n**What should have happened:**\n\n**Screenshots/evidence:**"},
+            "suggestion":    {"emoji": "💡", "name": "suggest", "title": "Suggestion",      "color": discord.Color.gold(),   "desc": "**Your suggestion:**\n\n**Why should this be added:**\n\n**How would it work:**"},
+            "help":          {"emoji": "❓", "name": "help",    "title": "General Help",    "color": discord.Color.blue(),   "desc": "**What do you need help with?**\n\nDescribe your question in detail."},
+            "report_player": {"emoji": "👤", "name": "report",  "title": "Player Report",   "color": discord.Color.orange(), "desc": "**Player username:**\n\n**What rule did they break:**\n\n**Evidence (screenshots/video):**\n\n**When did this happen:**"},
+            "appeal":        {"emoji": "🔨", "name": "appeal",  "title": "Ban Appeal",      "color": discord.Color.dark_red(),"desc": "**Your Minecraft username:**\n\n**Why were you banned:**\n\n**Why should you be unbanned:**\n\n**Do you understand what you did wrong:**"},
+            "pvp":           {"emoji": "⚔️", "name": "pvp",     "title": "PVP Dispute",     "color": discord.Color.purple(), "desc": "**What happened:**\n\n**Who was involved:**\n\n**Evidence:**"},
+            "other":         {"emoji": "🎯", "name": "other",   "title": "General Support", "color": discord.Color.blurple(),"desc": "**Describe your issue:**"},
         }
-        
-        if mod_role:
-            overwrites[mod_role] = discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                manage_messages=True
-            )
-        if admin_role:
-            overwrites[admin_role] = discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                manage_messages=True
-            )
-        if owner_role:
-            overwrites[owner_role] = discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                manage_messages=True
-            )
-        if dev_role:
-            overwrites[dev_role] = discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True
-            )
-        
-        # Ticket type configurations
-        ticket_details = {
-            "bug": {
-                "emoji": "🐛",
-                "name": "bug",
-                "title": "Bug Report",
-                "color": discord.Color.red(),
-                "description": "**Please provide the following information:**\n\n"
-                              "**What happened?**\n"
-                              "Describe the bug in detail.\n\n"
-                              "**Steps to reproduce:**\n"
-                              "1. Step one\n"
-                              "2. Step two\n"
-                              "3. ...\n\n"
-                              "**Expected behavior:**\n"
-                              "What should have happened?\n\n"
-                              "**Screenshots/Videos:**\n"
-                              "Attach any relevant media if possible."
-            },
-            "suggestion": {
-                "emoji": "💡",
-                "name": "suggestion",
-                "title": "Suggestion",
-                "color": discord.Color.gold(),
-                "description": "**Please describe your suggestion:**\n\n"
-                              "**What feature would you like to see?**\n\n"
-                              "**Why should this be added?**\n\n"
-                              "**How would it work?**\n\n"
-                              "**Additional details:**"
-            },
-            "help": {
-                "emoji": "❓",
-                "name": "help",
-                "title": "General Help",
-                "color": discord.Color.blue(),
-                "description": "**What do you need help with?**\n\n"
-                              "Please describe your question or issue in detail.\n\n"
-                              "Our staff will assist you as soon as possible!"
-            },
-            "report_player": {
-                "emoji": "👤",
-                "name": "report",
-                "title": "Player Report",
-                "color": discord.Color.orange(),
-                "description": "**Please provide the following:**\n\n"
-                              "**Player username:**\n\n"
-                              "**What rule did they break?**\n\n"
-                              "**Evidence:**\n"
-                              "Screenshots, videos, or detailed description\n\n"
-                              "**When did this happen?**\n"
-                              "Date and time"
-            },
-            "appeal": {
-                "emoji": "🔨",
-                "name": "appeal",
-                "title": "Ban Appeal",
-                "color": discord.Color.dark_red(),
-                "description": "**Please provide:**\n\n"
-                              "**Your username:**\n\n"
-                              "**Ban reason:**\n"
-                              "Why were you banned?\n\n"
-                              "**Why should you be unbanned?**\n\n"
-                              "**Do you understand what you did wrong?**"
-            },
-            "purchase": {
-                "emoji": "💰",
-                "name": "purchase",
-                "title": "Purchase Support",
-                "color": discord.Color.green(),
-                "description": "**Please provide:**\n\n"
-                              "**Purchase details:**\n"
-                              "What did you purchase?\n\n"
-                              "**Transaction ID:**\n\n"
-                              "**Issue description:**\n"
-                              "What's the problem?\n\n"
-                              "**Receipt/Screenshot:**\n"
-                              "Attach if possible"
-            },
-            "other": {
-                "emoji": "🎯",
-                "name": "other",
-                "title": "General Support",
-                "color": discord.Color.purple(),
-                "description": "**Please describe your issue or question:**\n\n"
-                              "Provide as much detail as possible so we can help you better."
-            }
-        }
-        
-        details = ticket_details[ticket_type]
-        
-        # Create ticket channel
+
+        info = ticket_info[ticket_type]
         channel = await guild.create_text_channel(
-            name=f"{details['emoji']}{details['name']}-{member.name}",
+            name=f"{info['emoji']}{info['name']}-{member.name}",
             category=category,
             topic=f"Ticket-{member.id}",
             overwrites=overwrites
         )
-        
-        # Create ticket embed
+
         embed = discord.Embed(
-            title=f"{details['emoji']} {details['title']}",
-            description=f"**Ticket opened by:** {member.mention}\n"
-                       f"**Type:** {details['title']}\n\n"
-                       f"{details['description']}\n\n"
+            title=f"{info['emoji']} {info['title']}",
+            description=f"**Opened by:** {member.mention}\n\n"
+                       f"{info['desc']}\n\n"
                        f"━━━━━━━━━━━━━━━━━━━━━━\n"
-                       f"**Staff will respond as soon as possible!**\n"
-                       f"Click 🔒 below to close this ticket when resolved.",
-            color=details['color']
+                       f"Staff will respond soon. Click 🔒 to close when resolved.",
+            color=info['color']
         )
-        embed.set_footer(text=f"Ticket ID: {member.id}")
+        embed.set_footer(text=f"SMPIL • Ticket ID: {member.id}")
         embed.timestamp = discord.utils.utcnow()
-        
-        # Mention member and staff
-        mention_text = member.mention
+
+        mention = member.mention
         if mod_role:
-            mention_text += f" {mod_role.mention}"
-        
-        await channel.send(
-            content=mention_text,
-            embed=embed,
-            view=TicketCloseButton()
-        )
-        
-        await interaction.followup.send(
-            f"✅ Ticket created successfully: {channel.mention}",
-            ephemeral=True
-        )
+            mention += f" {mod_role.mention}"
+
+        await channel.send(content=mention, embed=embed, view=TicketCloseButton())
+        await interaction.followup.send(f"✅ Ticket created: {channel.mention}", ephemeral=True)
 
 class TicketButton(discord.ui.View):
     def __init__(self):
@@ -1185,532 +350,469 @@ class TicketButton(discord.ui.View):
 class TicketCloseButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-    
-    @discord.ui.button(label="🔒 Close Ticket", style=discord.ButtonStyle.red, custom_id="close_ticket_persistent")
+
+    @discord.ui.button(label="🔒 Close Ticket", style=discord.ButtonStyle.red, custom_id="smpil_close_ticket_persistent")
     async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
-        
         embed = discord.Embed(
             title="🔒 Ticket Closing",
-            description=f"This ticket has been closed by {interaction.user.mention}\n\n"
-                       f"This channel will be deleted in 5 seconds...",
+            description=f"Closed by {interaction.user.mention}\n\nDeleting in 5 seconds...",
             color=discord.Color.red()
         )
-        embed.timestamp = discord.utils.utcnow()
-        
         await interaction.channel.send(embed=embed)
         await asyncio.sleep(5)
-        
         try:
             await interaction.channel.delete()
         except:
             pass
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# SLASH COMMANDS - AUTOSETUP (COMPLETE SERVER SETUP)
+# APPLICATION SYSTEM
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@bot.tree.command(name="autosetup", description="🚀 Complete automatic server setup (roles, channels, permissions)")
+class ApplicationModal(discord.ui.Modal, title="⚔️ SMPIL Staff Application"):
+    ign = discord.ui.TextInput(label="Minecraft IGN", placeholder="Your in-game name...", required=True, max_length=50)
+    age = discord.ui.TextInput(label="Your Age", placeholder="How old are you?", required=True, max_length=3)
+    position = discord.ui.TextInput(label="Position Applying For", placeholder="Mod, Helper, Admin...", required=True, max_length=50)
+    experience = discord.ui.TextInput(label="Staff Experience", placeholder="Previous moderation experience...", required=False, style=discord.TextStyle.paragraph, max_length=500)
+    why = discord.ui.TextInput(label="Why Should We Pick You?", placeholder="Tell us why you'd be a good staff member...", required=True, style=discord.TextStyle.paragraph, max_length=500)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        guild = interaction.guild
+        member = interaction.user
+
+        try:
+            age_num = int(self.age.value)
+            if age_num < 13:
+                await interaction.followup.send("❌ You must be at least 13 to apply.", ephemeral=True)
+                return
+        except:
+            await interaction.followup.send("❌ Enter a valid age.", ephemeral=True)
+            return
+
+        existing = discord.utils.get(guild.text_channels, topic=f"Application-{member.id}")
+        if existing:
+            await interaction.followup.send(f"❌ You already have an open application: {existing.mention}", ephemeral=True)
+            return
+
+        app_category = discord.utils.get(guild.categories, name="📝 APPLICATIONS")
+        if not app_category:
+            app_category = await guild.create_category("📝 APPLICATIONS")
+
+        mod_role = discord.utils.get(guild.roles, name="⚔️ Mod")
+        admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
+        owner_role = discord.utils.get(guild.roles, name="👑 Owner")
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            member: discord.PermissionOverwrite(view_channel=True, send_messages=True, attach_files=True)
+        }
+        if mod_role:
+            overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+        if admin_role:
+            overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+        if owner_role:
+            overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+
+        app_channel = await guild.create_text_channel(
+            name=f"📝app-{member.name}",
+            category=app_category,
+            topic=f"Application-{member.id}",
+            overwrites=overwrites
+        )
+
+        account_age = (discord.utils.utcnow() - member.created_at).days
+        server_age = (discord.utils.utcnow() - member.joined_at).days if member.joined_at else 0
+
+        embed = discord.Embed(
+            title="📝 New Staff Application",
+            description=f"**Applicant:** {member.mention}\n━━━━━━━━━━━━━━━━━━━━━━",
+            color=discord.Color.from_rgb(233, 69, 96)
+        )
+        embed.add_field(
+            name="👤 Player Info",
+            value=f"**Discord:** {member.name}\n**IGN:** {self.ign.value}\n**Age:** {self.age.value}\n**Account Age:** {account_age} days\n**In Server:** {server_age} days",
+            inline=False
+        )
+        embed.add_field(
+            name="📋 Application",
+            value=f"**Position:** {self.position.value}\n**Experience:** {self.experience.value or 'None provided'}\n**Why them:** {self.why.value}",
+            inline=False
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.set_footer(text=f"Application ID: {member.id}")
+        embed.timestamp = discord.utils.utcnow()
+
+        mention_text = f"📢 New Application!\n{member.mention}\n"
+        if admin_role:
+            mention_text += f"{admin_role.mention}"
+
+        await app_channel.send(content=mention_text, embed=embed, view=ApplicationReviewButtons())
+
+        try:
+            dm_embed = discord.Embed(
+                title="✅ Application Submitted!",
+                description=f"Your SMPIL staff application has been submitted!\n\n"
+                           f"**Position:** {self.position.value}\n"
+                           f"**Status:** 🟡 Pending Review\n\n"
+                           f"Staff will review it soon. Check {app_channel.mention} for updates!\n\n"
+                           f"Good luck! 🍀",
+                color=discord.Color.green()
+            )
+            await member.send(embed=dm_embed)
+        except:
+            pass
+
+        await interaction.followup.send(
+            f"✅ Application submitted! Check {app_channel.mention} for updates.",
+            ephemeral=True
+        )
+
+class ApplicationButton(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="📝 Apply Now", style=discord.ButtonStyle.green, custom_id="smpil_application_persistent")
+    async def application_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(ApplicationModal())
+
+class ApplicationReviewButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="✅ Accept", style=discord.ButtonStyle.green, custom_id="smpil_app_accept_persistent")
+    async def accept_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message("❌ Staff only!", ephemeral=True)
+            return
+
+        channel_topic = interaction.channel.topic
+        if not channel_topic or "Application-" not in channel_topic:
+            await interaction.response.send_message("❌ Cannot find applicant info.", ephemeral=True)
+            return
+
+        applicant_id = int(channel_topic.split("Application-")[1])
+        applicant = interaction.guild.get_member(applicant_id)
+
+        embed = discord.Embed(
+            title="✅ Application Accepted!",
+            description=f"**Congratulations {applicant.mention if applicant else 'applicant'}!**\n\n"
+                       f"Your application was **ACCEPTED** by {interaction.user.mention}!\n\n"
+                       f"A staff member will assign your role shortly. Welcome to the team! 🎉",
+            color=discord.Color.green()
+        )
+        await interaction.response.send_message(embed=embed)
+
+        if applicant:
+            try:
+                dm = discord.Embed(title="🎉 SMPIL Staff Application Accepted!", description="You've been accepted to the SMPIL staff team! Welcome aboard! 🎉", color=discord.Color.green())
+                await applicant.send(embed=dm)
+            except:
+                pass
+
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+
+    @discord.ui.button(label="❌ Reject", style=discord.ButtonStyle.red, custom_id="smpil_app_reject_persistent")
+    async def reject_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message("❌ Staff only!", ephemeral=True)
+            return
+
+        channel_topic = interaction.channel.topic
+        if not channel_topic or "Application-" not in channel_topic:
+            await interaction.response.send_message("❌ Cannot find applicant info.", ephemeral=True)
+            return
+
+        applicant_id = int(channel_topic.split("Application-")[1])
+        applicant = interaction.guild.get_member(applicant_id)
+
+        embed = discord.Embed(
+            title="❌ Application Rejected",
+            description=f"**{applicant.mention if applicant else 'Applicant'}**\n\n"
+                       f"Application rejected by {interaction.user.mention}.\n\n"
+                       f"You may reapply in 30 days.",
+            color=discord.Color.red()
+        )
+        await interaction.response.send_message(embed=embed)
+
+        if applicant:
+            try:
+                dm = discord.Embed(title="Application Update", description="Your SMPIL staff application was not accepted this time. You can reapply in 30 days. Keep being active! ✨", color=discord.Color.red())
+                await applicant.send(embed=dm)
+            except:
+                pass
+
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+
+    @discord.ui.button(label="🔒 Close", style=discord.ButtonStyle.gray, custom_id="smpil_app_close_persistent")
+    async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message("❌ Staff only!", ephemeral=True)
+            return
+        await interaction.response.defer()
+        embed = discord.Embed(title="🔒 Application Closing", description=f"Closed by {interaction.user.mention}\n\nDeleting in 5 seconds...", color=discord.Color.red())
+        await interaction.channel.send(embed=embed)
+        await asyncio.sleep(5)
+        try:
+            await interaction.channel.delete()
+        except:
+            pass
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUTOSETUP COMMAND
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@bot.tree.command(name="autosetup", description="🚀 Complete SMPIL server setup")
 @app_commands.checks.has_permissions(administrator=True)
 async def autosetup(interaction: discord.Interaction):
     await interaction.response.defer()
-    
     guild = interaction.guild
     log = []
-    
-    log.append("**🚀 STARTING COMPLETE SERVER SETUP...**\n")
-    
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CREATE ALL 10 ROLES
-    # ═══════════════════════════════════════════════════════════════════════════
-    
+    log.append("**🚀 SETTING UP SMPIL SERVER...**\n")
+
+    # ROLES
     log.append("**📝 Creating Roles...**")
-    
     roles_config = [
-        ("👑 Owner", discord.Color.gold(), discord.Permissions.all()),
-        ("🛡️ Admin", discord.Color.dark_red(), discord.Permissions(administrator=True)),
-        ("⚔️ Moderator", discord.Color.red(), discord.Permissions(
-            kick_members=True, ban_members=True, manage_messages=True,
-            manage_channels=True, mute_members=True, moderate_members=True,
-            view_audit_log=True, manage_roles=True
-        )),
-        ("💻 Developer", discord.Color.blue(), discord.Permissions(
-            manage_messages=True, manage_channels=True, view_audit_log=True
-        )),
-        ("✅ Verified", discord.Color.green(), discord.Permissions.none()),
-        ("❌ Unverified", discord.Color.dark_gray(), discord.Permissions.none()),
-        ("🔇 Muted", discord.Color.dark_gray(), discord.Permissions(
-            send_messages=False, add_reactions=False, speak=False,
-            send_messages_in_threads=False
-        )),
-        ("🧪 Tester", discord.Color.purple(), discord.Permissions(
-            send_messages=True, attach_files=True, embed_links=True
-        )),
-        ("🎮 Player", discord.Color.from_rgb(0, 255, 127), discord.Permissions.none()),
-        ("🤖 Bot", discord.Color.light_gray(), discord.Permissions.none())
+        ("👑 Owner",    discord.Color.gold(),                  discord.Permissions.all()),
+        ("🛡️ Admin",    discord.Color.dark_red(),              discord.Permissions(administrator=True)),
+        ("⚔️ Mod",      discord.Color.red(),                   discord.Permissions(kick_members=True, ban_members=True, manage_messages=True, moderate_members=True, view_audit_log=True)),
+        ("🤝 Helper",   discord.Color.blue(),                  discord.Permissions(manage_messages=True)),
+        ("💎 VIP+",     discord.Color.from_rgb(255, 215, 0),   discord.Permissions.none()),
+        ("💠 VIP",      discord.Color.from_rgb(0, 191, 255),   discord.Permissions.none()),
+        ("✅ Verified",  discord.Color.green(),                 discord.Permissions.none()),
+        ("❌ Unverified",discord.Color.dark_gray(),             discord.Permissions.none()),
+        ("🔇 Muted",    discord.Color.dark_gray(),             discord.Permissions(send_messages=False, add_reactions=False, speak=False)),
+        ("🤖 Bot",      discord.Color.light_gray(),            discord.Permissions.none()),
     ]
-    
+
     created_roles = {}
     for role_name, role_color, role_perms in roles_config:
         role = discord.utils.get(guild.roles, name=role_name)
         if not role:
-            role = await guild.create_role(
-                name=role_name,
-                color=role_color,
-                permissions=role_perms
-            )
+            role = await guild.create_role(name=role_name, color=role_color, permissions=role_perms)
             log.append(f"✅ Created: {role_name}")
         else:
-            log.append(f"⚪ Already exists: {role_name}")
+            log.append(f"⚪ Exists: {role_name}")
         created_roles[role_name] = role
-        await asyncio.sleep(0.5)
-    
-    log.append("")
-    
-    # Get important roles for permissions
-    verified_role = created_roles["✅ Verified"]
-    unverified_role = created_roles["❌ Unverified"]
-    mod_role = created_roles["⚔️ Moderator"]
-    admin_role = created_roles["🛡️ Admin"]
-    owner_role = created_roles["👑 Owner"]
-    muted_role = created_roles["🔇 Muted"]
-    dev_role = created_roles["💻 Developer"]
-    tester_role = created_roles["🧪 Tester"]
-    
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CREATE CATEGORIES AND CHANNELS
-    # ═══════════════════════════════════════════════════════════════════════════
-    
-    log.append("**📁 Creating Categories & Channels...**")
-    
-    # ═══ VERIFICATION CATEGORY ═══
-    verify_cat = discord.utils.get(guild.categories, name="🔐 VERIFICATION")
-    if not verify_cat:
-        verify_cat = await guild.create_category("🔐 VERIFICATION")
-        log.append("✅ Category: 🔐 VERIFICATION")
-    
-    await verify_cat.edit(overwrites={
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        unverified_role: discord.PermissionOverwrite(view_channel=True, send_messages=False),
-        verified_role: discord.PermissionOverwrite(view_channel=False),
-        mod_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        admin_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        owner_role: discord.PermissionOverwrite(view_channel=True, send_messages=True)
-    })
-    
-    verify_channel = discord.utils.get(guild.text_channels, name='✅-verify')
-    if not verify_channel:
-        verify_channel = await guild.create_text_channel('✅-verify', category=verify_cat)
-        log.append("✅ Channel: ✅-verify")
-        
-        # Send verification message
-        embed = discord.Embed(
-            title="🔐 Server Verification Required",
-            description="**Welcome to My Legs Are Not Mine!**\n\n"
-                       "To access the server and all channels, please verify yourself by clicking the button below.\n\n"
-                       "After verification, you'll receive the server rules in your DMs!\n\n"
-                       "━━━━━━━━━━━━━━━━━━━━━━\n"
-                       "**Why verification?**\n"
-                       "• Prevents spam and bots\n"
-                       "• Keeps the server safe\n"
-                       "• Takes only 1 click!",
-            color=discord.Color.blue()
-        )
-        embed.set_footer(text="Click the button below to get started!")
-        await verify_channel.send(embed=embed, view=VerifyButton())
-    
-    # ═══ INFORMATION CATEGORY ═══
+        await asyncio.sleep(0.3)
+
+    verified_role  = created_roles["✅ Verified"]
+    unverified_role= created_roles["❌ Unverified"]
+    mod_role       = created_roles["⚔️ Mod"]
+    admin_role     = created_roles["🛡️ Admin"]
+    owner_role     = created_roles["👑 Owner"]
+    muted_role     = created_roles["🔇 Muted"]
+
+    log.append("\n**📁 Creating Channels...**")
+
+    # INFORMATION category
     info_cat = discord.utils.get(guild.categories, name="📢 INFORMATION")
     if not info_cat:
         info_cat = await guild.create_category("📢 INFORMATION")
-        log.append("✅ Category: 📢 INFORMATION")
-    
     await info_cat.edit(overwrites={
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        verified_role: discord.PermissionOverwrite(view_channel=True, send_messages=False),
-        mod_role: discord.PermissionOverwrite(send_messages=True),
+        guild.default_role: discord.PermissionOverwrite(view_channel=True, send_messages=False),
         admin_role: discord.PermissionOverwrite(send_messages=True),
         owner_role: discord.PermissionOverwrite(send_messages=True),
-        muted_role: discord.PermissionOverwrite(send_messages=False)
+        muted_role: discord.PermissionOverwrite(send_messages=False),
     })
-    
-    info_channels = ["📜-rules", "📢-announcements", "📰-updates", "🎉-events"]
+
+    info_channels = ["📜-rules", "📢-announcements", "📰-updates", "🎉-events", "🌐-server-info"]
     for ch_name in info_channels:
         if not discord.utils.get(guild.text_channels, name=ch_name):
-            channel = await guild.create_text_channel(ch_name, category=info_cat)
-            log.append(f"✅ Channel: {ch_name}")
-            
-            # Post rules
+            ch = await guild.create_text_channel(ch_name, category=info_cat)
+            log.append(f"✅ #{ch_name}")
             if ch_name == "📜-rules":
-                rules_embed = discord.Embed(
-                    title="📜 SERVER RULES",
-                    description="Please follow these rules to keep our server awesome and welcoming for everyone!",
-                    color=discord.Color.gold()
+                await ch.send("""@everyone **SMPIL SERVER RULES**
+
+**1.** No XRay or texture packs that give an unfair advantage
+**2.** No hacks — fly, reach, kill aura, etc.
+**3.** No item duping or exploit abuse — bannable offense
+**4.** Anchors and End Crystals are NOT allowed in PVP
+**5.** Thorns enchantment is banned
+**6.** No griefing or stealing from others (unless active war)
+**7.** Minimaps are banned
+**8.** Knowing/using the server seed to find structures is bannable
+**9.** Don't combat log — you will die and drop your items
+**10.** Respect all players — no harassment or hate speech
+**11.** If recording, no hardcore texture packs and follow the server lore
+**12.** Listen to staff — their decisions are final
+
+**Punishment:** Warning → Kick → Temp Ban → Permanent Ban
+**Server IP:** `SMPIL.aternos.me:50992`""")
+            if ch_name == "🌐-server-info":
+                info_embed = discord.Embed(
+                    title="⚔️ SMPIL Minecraft Server",
+                    description="Welcome to SMPIL!",
+                    color=discord.Color.from_rgb(233, 69, 96)
                 )
-                rules_embed.add_field(
-                    name="1️⃣ Be Respectful",
-                    value="Treat everyone with kindness and respect. No harassment, hate speech, racism, or bullying of any kind.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="2️⃣ No Spam",
-                    value="Don't spam messages, emojis, mentions, or links. Spam = automatic timeout. Repeated spam = kick.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="3️⃣ No NSFW Content",
-                    value="Keep all content appropriate for all ages. No NSFW images, links, or discussions.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="4️⃣ No Advertising",
-                    value="Don't advertise other servers, products, or social media without permission from staff.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="5️⃣ No Cheating/Exploits",
-                    value="Don't discuss, share, or use cheats, hacks, or exploits for the game.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="6️⃣ English Only",
-                    value="Please use English in public channels so everyone can understand and participate.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="7️⃣ Listen to Staff",
-                    value="Follow instructions from Moderators and Admins. Their decisions are final.",
-                    inline=False
-                )
-                rules_embed.add_field(
-                    name="⚠️ Consequences",
-                    value="**Breaking rules:**\n1st offense: Warning\n2nd offense: Timeout\n3rd offense: Kick\n4th offense: Ban",
-                    inline=False
-                )
-                rules_embed.set_footer(text="Questions? Open a ticket in 🎫-create-ticket")
-                await channel.send(embed=rules_embed)
-    
-    # ═══ COMMUNITY CATEGORY ═══
+                info_embed.add_field(name="🌐 Server IP", value="`SMPIL.aternos.me`", inline=True)
+                info_embed.add_field(name="🔌 Port", value="`50992`", inline=True)
+                info_embed.add_field(name="📦 Version", value="Java 1.21.1", inline=True)
+                info_embed.add_field(name="🎮 Type", value="SMP (Survival Multiplayer)", inline=True)
+                info_embed.add_field(name="🗺️ World", value="Custom SMP World", inline=True)
+                info_embed.add_field(name="⚙️ Plugins", value="Skript, EssentialsX, Vault", inline=True)
+                await ch.send(embed=info_embed)
+
+    # COMMUNITY category
     community_cat = discord.utils.get(guild.categories, name="💬 COMMUNITY")
     if not community_cat:
         community_cat = await guild.create_category("💬 COMMUNITY")
-        log.append("✅ Category: 💬 COMMUNITY")
-    
     await community_cat.edit(overwrites={
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
         verified_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        muted_role: discord.PermissionOverwrite(send_messages=False, speak=False)
+        muted_role: discord.PermissionOverwrite(send_messages=False, speak=False),
     })
-    
-    community_channels = ["💬-general", "🎮-game-chat", "😂-memes", "📸-media", "🎨-art"]
-    for ch_name in community_channels:
+    for ch_name in ["💬-general", "💭-chat", "😂-memes", "📸-screenshots", "🎮-gameplay"]:
         if not discord.utils.get(guild.text_channels, name=ch_name):
             await guild.create_text_channel(ch_name, category=community_cat)
-            log.append(f"✅ Channel: {ch_name}")
-    
-    # ═══ MY LEGS ARE NOT MINE CATEGORY ═══
-    game_cat = discord.utils.get(guild.categories, name="🎮 MY LEGS ARE NOT MINE")
-    if not game_cat:
-        game_cat = await guild.create_category("🎮 MY LEGS ARE NOT MINE")
-        log.append("✅ Category: 🎮 MY LEGS ARE NOT MINE")
-    
-    await game_cat.edit(overwrites={
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        verified_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        muted_role: discord.PermissionOverwrite(send_messages=False)
+            log.append(f"✅ #{ch_name}")
+
+    # VERIFY category
+    verify_cat = discord.utils.get(guild.categories, name="🔐 VERIFY")
+    if not verify_cat:
+        verify_cat = await guild.create_category("🔐 VERIFY")
+    await verify_cat.edit(overwrites={
+        guild.default_role: discord.PermissionOverwrite(view_channel=True, send_messages=False),
+        unverified_role: discord.PermissionOverwrite(view_channel=True, send_messages=False),
     })
-    
-    game_channels = ["🎮-gameplay", "🏆-leaderboards", "🐛-bugs", "💡-suggestions", "🔧-game-help"]
-    for ch_name in game_channels:
-        if not discord.utils.get(guild.text_channels, name=ch_name):
-            await guild.create_text_channel(ch_name, category=game_cat)
-            log.append(f"✅ Channel: {ch_name}")
-    
-    # ═══ VOICE CHANNELS CATEGORY ═══
-    voice_cat = discord.utils.get(guild.categories, name="🔊 VOICE CHANNELS")
+    verify_ch = discord.utils.get(guild.text_channels, name="✅-verify")
+    if not verify_ch:
+        verify_ch = await guild.create_text_channel("✅-verify", category=verify_cat)
+        log.append("✅ #✅-verify")
+        embed = discord.Embed(
+            title="🔐 SMPIL Verification",
+            description="**Welcome to SMPIL!**\n\n"
+                       "Click the button below to verify and get access to all channels.\n\n"
+                       "After verifying you'll receive the server rules in your DMs!\n\n"
+                       "**Server IP:** `SMPIL.aternos.me:50992`",
+            color=discord.Color.from_rgb(233, 69, 96)
+        )
+        embed.set_footer(text="SMPIL • One click to get started!")
+        await verify_ch.send(embed=embed, view=VerifyButton())
+
+    # VOICE category
+    voice_cat = discord.utils.get(guild.categories, name="🔊 VOICE")
     if not voice_cat:
-        voice_cat = await guild.create_category("🔊 VOICE CHANNELS")
-        log.append("✅ Category: 🔊 VOICE CHANNELS")
-    
+        voice_cat = await guild.create_category("🔊 VOICE")
     await voice_cat.edit(overwrites={
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
         verified_role: discord.PermissionOverwrite(view_channel=True, connect=True, speak=True),
-        muted_role: discord.PermissionOverwrite(speak=False)
+        muted_role: discord.PermissionOverwrite(speak=False),
     })
-    
-    voice_channels = ["🔊 General Voice", "🎮 Gaming Voice 1", "🎮 Gaming Voice 2", "🎵 Music", "💤 AFK"]
-    for vc_name in voice_channels:
+    for vc_name in ["🔊 General", "⚔️ PVP Squad", "🏗️ Building", "💤 AFK"]:
         if not discord.utils.get(guild.voice_channels, name=vc_name):
             vc = await guild.create_voice_channel(vc_name, category=voice_cat)
-            log.append(f"✅ Voice: {vc_name}")
-            
-            # Set AFK channel
-            if vc_name == "💤 AFK":
+            log.append(f"✅ 🔊 {vc_name}")
+            if "AFK" in vc_name:
                 try:
                     await guild.edit(afk_channel=vc, afk_timeout=300)
                 except:
                     pass
-    
-    # ═══ TICKETS CATEGORY ═══
+
+    # TICKETS category
     ticket_cat = discord.utils.get(guild.categories, name="🎫 TICKETS")
     if not ticket_cat:
         ticket_cat = await guild.create_category("🎫 TICKETS")
-        log.append("✅ Category: 🎫 TICKETS")
-    
     await ticket_cat.edit(overwrites={
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        verified_role: discord.PermissionOverwrite(view_channel=False),
         mod_role: discord.PermissionOverwrite(view_channel=True),
         admin_role: discord.PermissionOverwrite(view_channel=True),
-        owner_role: discord.PermissionOverwrite(view_channel=True)
+        owner_role: discord.PermissionOverwrite(view_channel=True),
     })
-    
-    ticket_panel_channel = discord.utils.get(guild.text_channels, name='🎫-create-ticket')
-    if not ticket_panel_channel:
-        ticket_panel_channel = await guild.create_text_channel('🎫-create-ticket', category=ticket_cat)
-        
-        # Override permissions for ticket panel channel
-        await ticket_panel_channel.edit(overwrites={
+    ticket_panel_ch = discord.utils.get(guild.text_channels, name="🎫-create-ticket")
+    if not ticket_panel_ch:
+        ticket_panel_ch = await guild.create_text_channel("🎫-create-ticket", category=ticket_cat)
+        await ticket_panel_ch.edit(overwrites={
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
             verified_role: discord.PermissionOverwrite(view_channel=True, send_messages=False),
             mod_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
             admin_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-            owner_role: discord.PermissionOverwrite(view_channel=True, send_messages=True)
+            owner_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
         })
-        
-        log.append(f"✅ Channel: 🎫-create-ticket")
-        
-        # Send ticket panel with dropdown
+        log.append("✅ #🎫-create-ticket")
         embed = discord.Embed(
-            title="🎫 Support Ticket System",
-            description="**Need help from our staff?**\n\n"
-                       "Select a ticket type from the dropdown menu below to create a support ticket.\n\n"
+            title="🎫 SMPIL Support Tickets",
+            description="**Need help from staff?**\n\n"
+                       "Select a ticket type from the dropdown below.\n\n"
                        "━━━━━━━━━━━━━━━━━━━━━━\n"
-                       "**Available Ticket Types:**\n\n"
-                       "🐛 **Bug Report** - Report game bugs or issues\n"
-                       "💡 **Suggestion** - Submit feature ideas and suggestions\n"
-                       "❓ **General Help** - Get help with questions\n"
-                       "👤 **Report Player** - Report players breaking rules\n"
-                       "🔨 **Ban Appeal** - Appeal a punishment or ban\n"
-                       "💰 **Purchase Support** - Issues with payments\n"
-                       "🎯 **Other** - Any other support needs\n\n"
+                       "🐛 Bug Report\n"
+                       "💡 Suggestion\n"
+                       "❓ General Help\n"
+                       "👤 Report Player\n"
+                       "🔨 Ban Appeal\n"
+                       "⚔️ PVP Dispute\n"
+                       "🎯 Other\n\n"
                        "━━━━━━━━━━━━━━━━━━━━━━\n"
-                       "**Our staff will respond as soon as possible!**",
-            color=discord.Color.blue()
+                       "Staff will respond as soon as possible!",
+            color=discord.Color.from_rgb(233, 69, 96)
         )
-        embed.set_footer(text="My Legs Are Not Mine • Support System")
-        await ticket_panel_channel.send(embed=embed, view=TicketButton())
-    
-    # ═══ STAFF CATEGORY ═══
-    staff_cat = discord.utils.get(guild.categories, name="🔒 STAFF")
+        embed.set_footer(text="SMPIL.aternos.me:50992")
+        await ticket_panel_ch.send(embed=embed, view=TicketButton())
+
+    # STAFF category
+    staff_cat = discord.utils.get(guild.categories, name="🛡️ STAFF")
     if not staff_cat:
-        staff_cat = await guild.create_category("🔒 STAFF")
-        log.append("✅ Category: 🔒 STAFF")
-    
+        staff_cat = await guild.create_category("🛡️ STAFF")
     await staff_cat.edit(overwrites={
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
         mod_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
         admin_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        owner_role: discord.PermissionOverwrite(view_channel=True, send_messages=True)
+        owner_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
     })
-    
-    staff_channels = ["🛡️-staff-chat", "📋-logs", "🔨-mod-actions"]
-    for ch_name in staff_channels:
+    for ch_name in ["💬-staff-chat", "📋-staff-logs", "🔨-punishments"]:
         if not discord.utils.get(guild.text_channels, name=ch_name):
             await guild.create_text_channel(ch_name, category=staff_cat)
-            log.append(f"✅ Channel: {ch_name}")
-    
-    # ═══ DEVELOPMENT CATEGORY ═══
-    dev_cat = discord.utils.get(guild.categories, name="💻 DEVELOPMENT")
-    if not dev_cat:
-        dev_cat = await guild.create_category("💻 DEVELOPMENT")
-        log.append("✅ Category: 💻 DEVELOPMENT")
-    
-    await dev_cat.edit(overwrites={
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        dev_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        tester_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        admin_role: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-        owner_role: discord.PermissionOverwrite(view_channel=True, send_messages=True)
-    })
-    
-    dev_channels = ["💻-dev-chat", "🧪-testing", "🐛-bug-reports", "📝-dev-logs"]
-    for ch_name in dev_channels:
-        if not discord.utils.get(guild.text_channels, name=ch_name):
-            await guild.create_text_channel(ch_name, category=dev_cat)
-            log.append(f"✅ Channel: {ch_name}")
-    
-    # ═══════════════════════════════════════════════════════════════════════════
-    # SETUP COMPLETE
-    # ═══════════════════════════════════════════════════════════════════════════
-    
-    log.append("")
-    log.append("**✅ SETUP COMPLETE!**")
+            log.append(f"✅ #{ch_name}")
+
+    log.append("\n**✅ SMPIL SETUP COMPLETE!**")
     log.append("━━━━━━━━━━━━━━━━━━━━━━━━")
-    log.append("**Summary:**")
     log.append("✅ 10 Roles Created")
-    log.append("✅ 8 Categories Created")
-    log.append("✅ 25+ Channels Created")
-    log.append("✅ All Permissions Configured")
+    log.append("✅ 5 Categories Created")
+    log.append("✅ 20+ Channels Created")
     log.append("✅ Verification System Active")
-    log.append("✅ Ticket System Active (7 types)")
-    log.append("✅ Anti-Spam Protection Active")
-    log.append("✅ Anti-Nuke Detection Active")
-    log.append("")
-    log.append("**🎉 Your server is now fully set up!**")
-    
-    # Send response (split if too long)
+    log.append("✅ Ticket System Active")
+    log.append("✅ Anti-Spam Active")
+    log.append(f"\n**Server IP: `SMPIL.aternos.me:50992`**")
+
     full_log = "\n".join(log)
-    
-    if len(full_log) > 4000:
-        chunks = [log[i:i+30] for i in range(0, len(log), 30)]
-        for i, chunk in enumerate(chunks):
-            embed = discord.Embed(
-                title=f"🚀 Server Setup {'Complete!' if i == len(chunks)-1 else f'Part {i+1}/{len(chunks)}'}",
-                description="\n".join(chunk),
-                color=discord.Color.green()
-            )
-            if i == 0:
-                await interaction.followup.send(embed=embed)
-            else:
-                await interaction.channel.send(embed=embed)
-            await asyncio.sleep(1)
-    else:
-        embed = discord.Embed(
-            title="🚀 Server Setup Complete!",
-            description=full_log,
-            color=discord.Color.green()
-        )
-        embed.set_footer(text="My Legs Are Not Mine • Complete Setup")
-        await interaction.followup.send(embed=embed)
+    embed = discord.Embed(
+        title="🚀 SMPIL Server Setup Complete!",
+        description=full_log[:4000],
+        color=discord.Color.from_rgb(233, 69, 96)
+    )
+    embed.set_footer(text="SMPIL • Server Setup")
+    await interaction.followup.send(embed=embed)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OTHER SLASH COMMANDS
+# MODERATION COMMANDS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@bot.tree.command(name="sync", description="🔄 Force sync all slash commands")
-@app_commands.checks.has_permissions(administrator=True)
-async def sync(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=True)
-    try:
-        synced = await bot.tree.sync()
-        await interaction.followup.send(
-            f"✅ Successfully synced {len(synced)} commands!\n\n"
-            f"Wait 5-10 minutes for Discord to update, then commands will appear.",
-            ephemeral=True
-        )
-    except Exception as e:
-        await interaction.followup.send(f"❌ Error: {e}", ephemeral=True)
-
-@bot.tree.command(name="createrole", description="🎭 Create a role (auto-detects permissions)")
-@app_commands.describe(name="Role name (e.g., VIP, Helper, Staff)")
-@app_commands.checks.has_permissions(administrator=True)
-async def createrole(interaction: discord.Interaction, name: str):
-    await interaction.response.defer()
-    
-    name_lower = name.lower()
-    
-    # Auto-detect role type
-    if "admin" in name_lower:
-        color = discord.Color.dark_red()
-        perms = discord.Permissions(administrator=True)
-        role_type = "Administrator"
-    elif "mod" in name_lower:
-        color = discord.Color.red()
-        perms = discord.Permissions(
-            kick_members=True,
-            ban_members=True,
-            manage_messages=True
-        )
-        role_type = "Moderator"
-    elif "vip" in name_lower or "premium" in name_lower:
-        color = discord.Color.gold()
-        perms = discord.Permissions.none()
-        role_type = "VIP"
-    else:
-        color = discord.Color.blue()
-        perms = discord.Permissions.none()
-        role_type = "Member"
-    
-    try:
-        role = await interaction.guild.create_role(
-            name=name,
-            color=color,
-            permissions=perms
-        )
-        
-        embed = discord.Embed(
-            title="✅ Role Created!",
-            description=f"**Role:** {role.mention}\n"
-                       f"**Type:** {role_type}\n"
-                       f"**Color:** {color}",
-            color=color
-        )
-        
-        await interaction.followup.send(embed=embed)
-    except Exception as e:
-        await interaction.followup.send(f"❌ Error: {e}")
-
-@bot.tree.command(name="giverole", description="➕ Give a role to a member")
-@app_commands.describe(member="Member to give role", role="Role to give")
-@app_commands.checks.has_permissions(manage_roles=True)
-async def giverole(interaction: discord.Interaction, member: discord.Member, role: discord.Role):
-    try:
-        await member.add_roles(role)
-        await interaction.response.send_message(
-            f"✅ Gave {role.mention} to {member.mention}"
-        )
-    except:
-        await interaction.response.send_message(
-            "❌ Failed! Make sure the bot's role is higher than the role you're trying to give.",
-            ephemeral=True
-        )
-
-@bot.tree.command(name="removerole", description="➖ Remove a role from a member")
-@app_commands.describe(member="Member to remove role from", role="Role to remove")
-@app_commands.checks.has_permissions(manage_roles=True)
-async def removerole(interaction: discord.Interaction, member: discord.Member, role: discord.Role):
-    try:
-        await member.remove_roles(role)
-        await interaction.response.send_message(
-            f"✅ Removed {role.mention} from {member.mention}"
-        )
-    except:
-        await interaction.response.send_message("❌ Failed!", ephemeral=True)
-
-@bot.tree.command(name="kick", description="👢 Kick a member from the server")
-@app_commands.describe(member="Member to kick", reason="Reason for kick")
+@bot.tree.command(name="kick", description="👢 Kick a member")
+@app_commands.describe(member="Member to kick", reason="Reason")
 @app_commands.checks.has_permissions(kick_members=True)
 async def kick(interaction: discord.Interaction, member: discord.Member, reason: str = "No reason provided"):
     try:
         await member.kick(reason=reason)
-        
-        embed = discord.Embed(
-            title="👢 Member Kicked",
-            description=f"**Member:** {member.mention}\n**Reason:** {reason}\n**Kicked by:** {interaction.user.mention}",
-            color=discord.Color.orange()
-        )
-        
+        embed = discord.Embed(title="👢 Member Kicked", description=f"**Member:** {member.mention}\n**Reason:** {reason}\n**By:** {interaction.user.mention}", color=discord.Color.orange())
         await interaction.response.send_message(embed=embed)
     except:
-        await interaction.response.send_message("❌ Failed to kick member!", ephemeral=True)
+        await interaction.response.send_message("❌ Failed to kick!", ephemeral=True)
 
-@bot.tree.command(name="ban", description="🔨 Ban a member from the server")
-@app_commands.describe(member="Member to ban", reason="Reason for ban")
+@bot.tree.command(name="ban", description="🔨 Ban a member")
+@app_commands.describe(member="Member to ban", reason="Reason")
 @app_commands.checks.has_permissions(ban_members=True)
 async def ban(interaction: discord.Interaction, member: discord.Member, reason: str = "No reason provided"):
     try:
         await member.ban(reason=reason)
-        
-        embed = discord.Embed(
-            title="🔨 Member Banned",
-            description=f"**Member:** {member.mention}\n**Reason:** {reason}\n**Banned by:** {interaction.user.mention}",
-            color=discord.Color.red()
-        )
-        
+        embed = discord.Embed(title="🔨 Member Banned", description=f"**Member:** {member.mention}\n**Reason:** {reason}\n**By:** {interaction.user.mention}", color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
     except:
-        await interaction.response.send_message("❌ Failed to ban member!", ephemeral=True)
+        await interaction.response.send_message("❌ Failed to ban!", ephemeral=True)
 
 @bot.tree.command(name="timeout", description="⏰ Timeout a member")
 @app_commands.describe(member="Member to timeout", minutes="Duration in minutes", reason="Reason")
@@ -1718,325 +820,117 @@ async def ban(interaction: discord.Interaction, member: discord.Member, reason: 
 async def timeout(interaction: discord.Interaction, member: discord.Member, minutes: int, reason: str = "No reason provided"):
     try:
         await member.timeout(datetime.timedelta(minutes=minutes), reason=reason)
-        
-        embed = discord.Embed(
-            title="⏰ Member Timed Out",
-            description=f"**Member:** {member.mention}\n**Duration:** {minutes} minutes\n**Reason:** {reason}\n**By:** {interaction.user.mention}",
-            color=discord.Color.orange()
-        )
-        
+        embed = discord.Embed(title="⏰ Member Timed Out", description=f"**Member:** {member.mention}\n**Duration:** {minutes} minutes\n**Reason:** {reason}\n**By:** {interaction.user.mention}", color=discord.Color.orange())
         await interaction.response.send_message(embed=embed)
     except:
-        await interaction.response.send_message("❌ Failed to timeout member!", ephemeral=True)
+        await interaction.response.send_message("❌ Failed!", ephemeral=True)
 
-@bot.tree.command(name="purge", description="🧹 Delete multiple messages")
-@app_commands.describe(amount="Number of messages to delete (1-100)")
+@bot.tree.command(name="purge", description="🧹 Delete messages")
+@app_commands.describe(amount="Number of messages (1-100)")
 @app_commands.checks.has_permissions(manage_messages=True)
 async def purge(interaction: discord.Interaction, amount: int):
     if amount < 1 or amount > 100:
-        await interaction.response.send_message("❌ Amount must be between 1 and 100!", ephemeral=True)
+        await interaction.response.send_message("❌ Between 1 and 100!", ephemeral=True)
         return
-    
     await interaction.response.defer(ephemeral=True)
-    
-    try:
-        deleted = await interaction.channel.purge(limit=amount)
-        await interaction.followup.send(
-            f"✅ Deleted {len(deleted)} messages!",
-            ephemeral=True
-        )
-    except:
-        await interaction.followup.send("❌ Failed to delete messages!", ephemeral=True)
+    deleted = await interaction.channel.purge(limit=amount)
+    await interaction.followup.send(f"✅ Deleted {len(deleted)} messages!", ephemeral=True)
 
-@bot.tree.command(name="ticket", description="🎫 Setup ticket panel in a channel")
-@app_commands.describe(channel="Channel to send ticket panel (default: current channel)")
+@bot.tree.command(name="giverole", description="➕ Give a role to a member")
+@app_commands.describe(member="Member", role="Role to give")
+@app_commands.checks.has_permissions(manage_roles=True)
+async def giverole(interaction: discord.Interaction, member: discord.Member, role: discord.Role):
+    try:
+        await member.add_roles(role)
+        await interaction.response.send_message(f"✅ Gave {role.mention} to {member.mention}")
+    except:
+        await interaction.response.send_message("❌ Failed! Make sure bot role is higher.", ephemeral=True)
+
+@bot.tree.command(name="removerole", description="➖ Remove a role from a member")
+@app_commands.describe(member="Member", role="Role to remove")
+@app_commands.checks.has_permissions(manage_roles=True)
+async def removerole(interaction: discord.Interaction, member: discord.Member, role: discord.Role):
+    try:
+        await member.remove_roles(role)
+        await interaction.response.send_message(f"✅ Removed {role.mention} from {member.mention}")
+    except:
+        await interaction.response.send_message("❌ Failed!", ephemeral=True)
+
+@bot.tree.command(name="sync", description="🔄 Sync slash commands")
 @app_commands.checks.has_permissions(administrator=True)
-async def ticket(interaction: discord.Interaction, channel: discord.TextChannel = None):
+async def sync(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    synced = await bot.tree.sync()
+    await interaction.followup.send(f"✅ Synced {len(synced)} commands! Wait 5 mins for Discord to update.", ephemeral=True)
+
+@bot.tree.command(name="ticket", description="🎫 Send ticket panel to a channel")
+@app_commands.describe(channel="Channel (default: current)")
+@app_commands.checks.has_permissions(administrator=True)
+async def ticket_cmd(interaction: discord.Interaction, channel: discord.TextChannel = None):
     if not channel:
         channel = interaction.channel
-    
-    embed = discord.Embed(
-        title="🎫 Support Ticket System",
-        description="**Need help from our staff?**\n\n"
-                   "Select a ticket type from the dropdown menu below!\n\n"
-                   "**Available Types:**\n"
-                   "🐛 Bug Report | 💡 Suggestion | ❓ Help\n"
-                   "👤 Report Player | 🔨 Ban Appeal\n"
-                   "💰 Purchase Support | 🎯 Other",
-        color=discord.Color.blue()
-    )
-    embed.set_footer(text="Staff will respond as soon as possible!")
-    
+    embed = discord.Embed(title="🎫 SMPIL Support", description="Select a ticket type from the dropdown below!", color=discord.Color.from_rgb(233, 69, 96))
     await channel.send(embed=embed, view=TicketButton())
-    await interaction.response.send_message(
-        f"✅ Ticket panel sent to {channel.mention}",
-        ephemeral=True
-    )
+    await interaction.response.send_message(f"✅ Ticket panel sent to {channel.mention}", ephemeral=True)
 
-@bot.tree.command(name="closeticket", description="🔒 Close the current ticket")
-@app_commands.checks.has_permissions(manage_channels=True)
-async def closeticket(interaction: discord.Interaction):
-    if not interaction.channel.topic or "Ticket-" not in interaction.channel.topic:
-        await interaction.response.send_message(
-            "❌ This is not a ticket channel!",
-            ephemeral=True
-        )
-        return
-    
-    await interaction.response.defer()
-    
-    embed = discord.Embed(
-        title="🔒 Ticket Closing",
-        description=f"This ticket has been closed by {interaction.user.mention}\n\nDeleting channel in 5 seconds...",
-        color=discord.Color.red()
-    )
-    
-    await interaction.channel.send(embed=embed)
-    await asyncio.sleep(5)
-    
-    try:
-        await interaction.channel.delete()
-    except:
-        pass
-
-@bot.tree.command(name="verify", description="🔐 Send verification panel to current channel")
+@bot.tree.command(name="verify", description="🔐 Send verification panel")
 @app_commands.checks.has_permissions(administrator=True)
-async def verify_command(interaction: discord.Interaction):
-    """Send verification panel to current channel"""
-    
+async def verify_cmd(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="🔐 Server Verification Required",
-        description="**Welcome to My Legs Are Not Mine!**\n\n"
-                   "To access the server and all channels, please verify yourself by clicking the button below.\n\n"
-                   "After verification, you'll receive the server rules in your DMs!\n\n"
-                   "━━━━━━━━━━━━━━━━━━━━━━\n"
-                   "**Why verification?**\n"
-                   "• Prevents spam and bots\n"
-                   "• Keeps the server safe\n"
-                   "• Takes only 1 click!",
-        color=discord.Color.blue()
+        title="🔐 SMPIL Verification",
+        description="Click the button below to verify and get access to all channels!\n\n**Server IP:** `SMPIL.aternos.me:50992`",
+        color=discord.Color.from_rgb(233, 69, 96)
     )
-    embed.set_footer(text="Click the button below to get started!")
-    
-    # Respond first, then send message
-    await interaction.response.send_message(
-        "✅ Verification panel sent to this channel!",
-        ephemeral=True
-    )
+    await interaction.response.send_message("✅ Sent!", ephemeral=True)
     await interaction.channel.send(embed=embed, view=VerifyButton())
 
-@bot.tree.command(name="application", description="📝 Create application channel and send panel")
+@bot.tree.command(name="application", description="📝 Send staff application panel")
 @app_commands.checks.has_permissions(administrator=True)
-async def application_command(interaction: discord.Interaction):
-    """Create application channel and send panel to it"""
-    
-    guild = interaction.guild
-    
-    # Check if application channel already exists
-    existing_channel = discord.utils.get(guild.text_channels, name="📝-applications")
-    
-    if existing_channel:
-        await interaction.response.send_message(
-            f"❌ Application channel already exists: {existing_channel.mention}\n\n"
-            f"Delete the old channel first if you want to create a new one.",
-            ephemeral=True
-        )
-        return
-    
-    await interaction.response.defer(ephemeral=True)
-    
-    # Get or create INFORMATION category
-    info_category = discord.utils.get(guild.categories, name="📢 INFORMATION")
-    if not info_category:
-        info_category = await guild.create_category("📢 INFORMATION")
-    
-    # Get roles
-    verified_role = discord.utils.get(guild.roles, name="✅ Verified")
-    mod_role = discord.utils.get(guild.roles, name="⚔️ Moderator")
-    admin_role = discord.utils.get(guild.roles, name="🛡️ Admin")
-    owner_role = discord.utils.get(guild.roles, name="👑 Owner")
-    muted_role = discord.utils.get(guild.roles, name="🔇 Muted")
-    
-    # Set permissions
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        verified_role: discord.PermissionOverwrite(view_channel=True, send_messages=False) if verified_role else None,
-        muted_role: discord.PermissionOverwrite(view_channel=False) if muted_role else None,
-    }
-    
-    if mod_role:
-        overwrites[mod_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
-    if admin_role:
-        overwrites[admin_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
-    if owner_role:
-        overwrites[owner_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
-    
-    # Remove None values
-    overwrites = {k: v for k, v in overwrites.items() if v is not None}
-    
-    # Create application channel
-    app_channel = await guild.create_text_channel(
-        name="📝-applications",
-        category=info_category,
-        topic="Apply for staff positions here • Click the button below to apply",
-        overwrites=overwrites
-    )
-    
-    # Send application panel
+async def application_cmd(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="📝 Staff Application System",
-        description="**Want to join our staff team?**\n\n"
-                   "Click the button below to start your application!\n\n"
-                   "━━━━━━━━━━━━━━━━━━━━━━\n"
+        title="📝 SMPIL Staff Applications",
+        description="**Want to join the SMPIL staff team?**\n\n"
+                   "Click Apply Now to start!\n\n"
                    "**We're looking for:**\n"
-                   "• Moderators 🛡️\n"
-                   "• Helpers 🤝\n"
-                   "• Developers 💻\n"
-                   "• Testers 🧪\n\n"
+                   "• Moderators ⚔️\n"
+                   "• Helpers 🤝\n\n"
                    "**Requirements:**\n"
-                   "• Must be verified (✅ Verified role)\n"
-                   "• At least 13 years old\n"
-                   "• Active in the server\n"
-                   "• Mature and responsible\n"
-                   "• Good communication skills\n"
-                   "• Follow all server rules\n\n"
-                   "━━━━━━━━━━━━━━━━━━━━━━\n"
-                   "**⚠️ Important:**\n"
-                   "• You can only have ONE active application\n"
-                   "• Be honest and detailed in your answers\n"
-                   "• Staff will review within 48 hours\n"
-                   "• Check your DMs for updates\n\n"
-                   "Good luck! 🍀",
-        color=discord.Color.green()
+                   "• 13+ years old\n"
+                   "• Active on the server\n"
+                   "• Mature and responsible",
+        color=discord.Color.from_rgb(233, 69, 96)
     )
-    embed.set_footer(text=f"{guild.name} • Staff Applications")
-    if guild.icon:
-        embed.set_thumbnail(url=guild.icon.url)
-    
-    await app_channel.send(embed=embed, view=ApplicationButton())
-    
-    await interaction.followup.send(
-        f"✅ **Application channel created successfully!**\n\n"
-        f"Channel: {app_channel.mention}\n\n"
-        f"Users can now apply for staff positions by clicking the button in that channel!",
-        ephemeral=True
-    )
+    await interaction.response.send_message("✅ Sent!", ephemeral=True)
+    await interaction.channel.send(embed=embed, view=ApplicationButton())
 
-@bot.tree.command(name="nuke", description="💣 Delete everything (DANGEROUS)")
-@app_commands.checks.has_permissions(administrator=True)
-async def nuke(interaction: discord.Interaction):
+@bot.tree.command(name="serverip", description="🌐 Show the SMPIL server IP")
+async def serverip(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="⚠️ NUCLEAR WARNING ⚠️",
-        description="**THIS WILL DELETE:**\n\n"
-                   "❌ ALL Channels\n"
-                   "❌ ALL Roles\n"
-                   "❌ ALL Emojis\n\n"
-                   "**⚠️ THIS CANNOT BE UNDONE! ⚠️**\n\n"
-                   "Type `/confirmnuke` to proceed",
-        color=discord.Color.dark_red()
+        title="⚔️ SMPIL Server IP",
+        description="**Join SMPIL now!**",
+        color=discord.Color.from_rgb(233, 69, 96)
     )
-    
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    embed.add_field(name="🌐 IP", value="`SMPIL.aternos.me`", inline=True)
+    embed.add_field(name="🔌 Port", value="`50992`", inline=True)
+    embed.add_field(name="📦 Version", value="Java 1.21.1", inline=True)
+    embed.set_footer(text="See you in the server!")
+    await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="confirmnuke", description="💥 CONFIRM - Delete everything")
-@app_commands.checks.has_permissions(administrator=True)
-async def confirmnuke(interaction: discord.Interaction):
-    await interaction.response.defer()
-    
-    guild = interaction.guild
-    count = 0
-    
-    # Delete all channels
-    for channel in list(guild.channels):
-        try:
-            await channel.delete()
-            count += 1
-        except:
-            pass
-    
-    # Delete all roles (except @everyone and bot roles)
-    for role in list(guild.roles):
-        if role.name != "@everyone" and not role.is_bot_managed():
-            try:
-                await role.delete()
-                await asyncio.sleep(0.5)
-            except:
-                pass
-    
-    # Create new channel to report
-    try:
-        new = await guild.create_text_channel("💥-nuked")
-        
-        embed = discord.Embed(
-            title="💥 SERVER NUKED",
-            description=f"**Deleted {count} channels**\n\nUse `/autosetup` to rebuild the server",
-            color=discord.Color.dark_red()
-        )
-        
-        await new.send(embed=embed)
-    except:
-        pass
-
-@bot.tree.command(name="help", description="📖 Show all bot commands and features")
+@bot.tree.command(name="help", description="📖 Show all commands")
 async def help_command(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="🤖 Bot Commands - My Legs Are Not Mine",
-        description="Complete server management bot with 24/7 uptime support",
-        color=discord.Color.blue()
+        title="⚔️ SMPIL Bot Commands",
+        description="**Server IP:** `SMPIL.aternos.me:50992`",
+        color=discord.Color.from_rgb(233, 69, 96)
     )
-    
-    embed.add_field(
-        name="🚀 Setup Commands",
-        value="**`/autosetup`** - Complete server setup (10 roles, 25+ channels, all permissions)\n"
-              "**`/sync`** - Force sync slash commands to Discord",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="🎭 Role Management",
-        value="**`/createrole <name>`** - Create role with auto-detected permissions\n"
-              "**`/giverole <member> <role>`** - Give role to a member\n"
-              "**`/removerole <member> <role>`** - Remove role from member",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="🛡️ Moderation",
-        value="**`/kick <member>`** - Kick member from server\n"
-              "**`/ban <member>`** - Ban member from server\n"
-              "**`/timeout <member> <minutes>`** - Timeout member\n"
-              "**`/purge <amount>`** - Delete multiple messages (1-100)",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="🎫 Ticket System",
-        value="**`/ticket`** - Setup ticket panel in a channel\n"
-              "**`/closeticket`** - Close current ticket\n\n"
-              "**7 Ticket Types:** Bug Report, Suggestion, General Help, Report Player, Ban Appeal, Purchase Support, Other",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="💣 Nuke (Dangerous)",
-        value="**`/nuke`** - Show warning\n"
-              "**`/confirmnuke`** - Delete everything (cannot be undone!)",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="✨ Automatic Features",
-        value="✅ Verification system with button\n"
-              "✅ Anti-spam protection (auto-timeout)\n"
-              "✅ Anti-nuke detection\n"
-              "✅ Auto-role on member join\n"
-              "✅ Welcome messages",
-        inline=False
-    )
-    
-    embed.set_footer(text="Bot created by Gh • Running 24/7")
+    embed.add_field(name="🚀 Setup", value="`/autosetup` - Full server setup\n`/sync` - Sync commands", inline=False)
+    embed.add_field(name="🔐 Systems", value="`/verify` - Send verify panel\n`/ticket` - Send ticket panel\n`/application` - Send staff app panel", inline=False)
+    embed.add_field(name="🎭 Roles", value="`/giverole` - Give role\n`/removerole` - Remove role", inline=False)
+    embed.add_field(name="🛡️ Moderation", value="`/kick` `/ban` `/timeout` `/purge`", inline=False)
+    embed.add_field(name="🌐 Info", value="`/serverip` - Show server IP\n`/help` - This menu", inline=False)
+    embed.add_field(name="✨ Auto Features", value="✅ Anti-spam (auto-timeout)\n✅ Welcome messages\n✅ Auto unverified role on join", inline=False)
+    embed.set_footer(text="SMPIL.aternos.me:50992")
     embed.set_thumbnail(url=bot.user.display_avatar.url)
-    
     await interaction.response.send_message(embed=embed)
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -2046,76 +940,33 @@ async def help_command(interaction: discord.Interaction):
 @bot.tree.error
 async def on_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.MissingPermissions):
-        await interaction.response.send_message(
-            "❌ You don't have permission to use this command!",
-            ephemeral=True
-        )
-    elif isinstance(error, app_commands.CommandOnCooldown):
-        await interaction.response.send_message(
-            f"⏰ This command is on cooldown. Try again in {error.retry_after:.1f} seconds.",
-            ephemeral=True
-        )
+        await interaction.response.send_message("❌ You don't have permission!", ephemeral=True)
     else:
-        await interaction.response.send_message(
-            f"❌ An error occurred: {str(error)}",
-            ephemeral=True
-        )
-        print(f"Error in command: {error}")
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# REGISTER PERSISTENT VIEWS (For button/dropdown to work after restart)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-@bot.event
-async def setup_hook():
-    """Register persistent views so buttons work after bot restarts"""
-    bot.add_view(VerifyButton())
-    bot.add_view(ApplicationButton())
-    bot.add_view(ApplicationReviewButtons())
-    bot.add_view(TicketButton())
-    bot.add_view(TicketCloseButton())
-    print("✅ Registered persistent views (buttons will work after restart)")
+        try:
+            await interaction.response.send_message(f"❌ Error: {str(error)}", ephemeral=True)
+        except:
+            pass
+        print(f"Command error: {error}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RUN BOT
 # ═══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    # Get token from environment variable (SECURE!)
-    TOKEN = os.getenv("DISCORD_TOKEN")
-    
-    if not TOKEN:
-        print("\n" + "═" * 70)
-        print("❌ ERROR: No bot token found!".center(70))
-        print("═" * 70)
-        print("\n📝 TO FIX THIS:")
-        print("\n1. Get your bot token:")
-        print("   • Go to: https://discord.com/developers/applications")
-        print("   • Select your bot → Bot → Reset Token → Copy token")
-        print("\n2. Add environment variable:")
-        print("   • Replit: Secrets → Key: DISCORD_TOKEN → Value: your_token")
-        print("   • Railway: Variables → DISCORD_TOKEN = your_token")
-        print("   • Render: Environment → DISCORD_TOKEN = your_token")
-        print("   • Local PC: Set environment variable or edit this file")
-        print("\n" + "═" * 70 + "\n")
-        exit()
-    
+    # PUT YOUR BOT TOKEN HERE
+    TOKEN = os.environ.get("DISCORD_TOKEN", "MTQ3ODg1NTk0MTEwODY2MjQyMw.GqTwFX.1HmTz1o5m9dglEJHkuYQ3L5IZqFplPJoJg0JKU")
+
     print("\n" + "═" * 70)
-    print("🤖 MY LEGS ARE NOT MINE - DISCORD BOT".center(70))
+    print("⚔️  SMPIL DISCORD BOT".center(70))
     print("═" * 70)
-    print("🔧 Complete Server Management Bot")
-    print("🌐 Ready for 24/7 Hosting (Replit, Railway, Render)")
-    print("✨ All Features Included")
+    print("🌐 Server: SMPIL.aternos.me:50992")
     print("═" * 70 + "\n")
-    
-    # Start keep-alive server (for Replit hosting)
+
     keep_alive()
-    
-    # Run the bot
+
     try:
         bot.run(TOKEN)
     except discord.LoginFailure:
-        print("\n❌ LOGIN FAILED: Invalid bot token!")
-        print("💡 Check your DISCORD_TOKEN environment variable\n")
+        print("\n❌ INVALID TOKEN! Change TOKEN in the code.\n")
     except Exception as e:
         print(f"\n❌ ERROR: {e}\n")
